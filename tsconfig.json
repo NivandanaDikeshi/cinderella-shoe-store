@@ -7,24 +7,19 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "ignoreDeprecations": "6.0",
 
     "esModuleInterop": true,
-
     "module": "esnext",
     "moduleResolution": "bundler",
 
     "resolveJsonModule": true,
     "isolatedModules": true,
-
     "jsx": "react-jsx",
 
     "incremental": true,
 
-    "baseUrl": ".",
-
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
     "plugins": [
@@ -38,10 +33,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.mts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-, "src/components/categories"  ],
+    ".next/dev/types/**/*.ts"
+  ],
 
   "exclude": ["node_modules"]
 }
