@@ -23,7 +23,9 @@ export const storage = getStorage(app);
 
 export const analytics =
   typeof window !== "undefined"
-    ? isSupported().then((yes) => (yes ? getAnalytics(app) : null))
+    ? isSupported().then((supported) =>
+        supported ? getAnalytics(app) : null
+      )
     : null;
 
 export default app;

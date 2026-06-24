@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
-
 import ReviewForm from "@/components/reviews/ReviewForm";
 import ReviewList from "@/components/reviews/ReviewList";
 
@@ -19,21 +18,21 @@ export default function ProductReviewsSection({ productId }: Props) {
     try {
       setLoading(true);
 
-      const reviewQuery = query(
+      const q = query(
         collection(db, "reviews"),
         where("productId", "==", productId)
       );
 
-      const reviewSnap = await getDocs(reviewQuery);
+      const snap = await getDocs(q);
 
-      const reviewData = reviewSnap.docs.map((doc) => ({
+      const data = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      setReviews(reviewData);
+      setReviews(data);
     } catch (error) {
-      console.error("Failed to load reviews:", error);
+      console.error("Error loading reviews:", error);
     } finally {
       setLoading(false);
     }
@@ -45,12 +44,10 @@ export default function ProductReviewsSection({ productId }: Props) {
 
   return (
     <div className="grid lg:grid-cols-3 gap-10">
-      {/* REVIEW FORM */}
       <div className="lg:col-span-1">
         <ReviewForm productId={productId} reloadReviews={loadReviews} />
       </div>
 
-      {/* REVIEW LIST */}
       <div className="lg:col-span-2">
         {loading ? (
           <div className="bg-white rounded-2xl border p-6 text-gray-500">
