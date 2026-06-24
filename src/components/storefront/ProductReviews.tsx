@@ -6,7 +6,7 @@ import ReviewForm from "@/components/reviews/ReviewForm";
 import ReviewList from "@/components/reviews/ReviewList";
 
 import {
-  getReviewsByProduct,
+  getReviewsByProductId,
 } from "@/services/reviewService";
 
 interface Props {
@@ -22,7 +22,7 @@ export default function ProductReviews({
   const loadReviews = async () => {
     try {
       const data =
-        await getReviewsByProduct(
+        await getReviewsByProductId(
           productId
         );
 
