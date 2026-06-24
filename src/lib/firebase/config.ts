@@ -9,8 +9,7 @@ const firebaseConfig = {
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId:
-    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
 };
@@ -23,9 +22,7 @@ export const storage = getStorage(app);
 
 export const analytics =
   typeof window !== "undefined"
-    ? isSupported().then((supported) =>
-        supported ? getAnalytics(app) : null
-      )
+    ? isSupported().then((yes) => (yes ? getAnalytics(app) : null))
     : null;
 
 export default app;

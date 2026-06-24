@@ -35,6 +35,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!auth) {
+      alert("Firebase auth is not available.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -46,12 +51,10 @@ export default function RegisterPage() {
 
       const user = userCredential.user;
 
-      // optional: update Firebase Auth display name
       await updateProfile(user, {
         displayName: name,
       });
 
-      // save user in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name,
@@ -98,8 +101,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-10">
       <div className="w-full max-w-md">
-
-        {/* HEADER */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold text-gray-900">
             Create Account
@@ -109,11 +110,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* CARD */}
         <div className="bg-white/70 backdrop-blur-xl border border-gray-200 shadow-xl rounded-3xl p-8">
           <form onSubmit={handleRegister} className="space-y-5">
-
-            {/* FULL NAME */}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Full Name
@@ -131,7 +129,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* EMAIL */}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Email
@@ -149,7 +146,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* PASSWORD */}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Password
@@ -167,7 +163,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* CONFIRM PASSWORD */}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Confirm Password
@@ -185,7 +180,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* BUTTON */}
             <button
               type="submit"
               disabled={loading}
@@ -196,7 +190,6 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* LOGIN LINK */}
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
             <Link href="/login" className="text-pink-600 font-semibold hover:underline">

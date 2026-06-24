@@ -44,6 +44,10 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
+      if (!auth) {
+        console.error("Logout error: auth is not initialized");
+        return;
+      }
       await signOut(auth);
       clearAdminData();
       router.push("/admin/login");
