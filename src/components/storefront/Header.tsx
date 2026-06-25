@@ -20,7 +20,7 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import useCartStore from "@/store/cartStore";
 import useWishlistStore from "@/store/wishlistStore";
-import authService from "@/services/authService";
+import * as authService from "@/services/authService";
 
 export default function Header() {
   const router = useRouter();

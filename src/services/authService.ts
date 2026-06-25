@@ -9,76 +9,51 @@ import {
 
 import { auth } from "@/lib/firebase/config";
 
-const getSafeAuth = () => {
+const getAuthInstance = () => {
   if (!auth) {
-    throw new Error("Firebase auth is not available.");
+    throw new Error("Firebase auth not initialized");
   }
   return auth;
 };
 
-const register = async (
+export const register = async (
   name: string,
   email: string,
   password: string
 ) => {
-  const firebaseAuth = getSafeAuth();
+  const firebaseAuth = getAuthInstance();
 
-  const userCredential =
-    await createUserWithEmailAndPassword(
-      firebaseAuth,
-      email,
-      password
-    );
-
-  await updateProfile(
-    userCredential.user,
-    {
-      displayName: name,
-    }
-  );
-
-  return userCredential;
-};
-
-const login = async (
-  email: string,
-  password: string
-) => {
-  const firebaseAuth = getSafeAuth();
-
-  return await signInWithEmailAndPassword(
+  const userCredential = await createUserWithEmailAndPassword(
     firebaseAuth,
     email,
     password
   );
+
+  await updateProfile(userCredential.user, {
+    displayName: name,
+  });
+
+  return userCredential;
 };
 
-const googleLogin = async () => {
-  const firebaseAuth = getSafeAuth();
+export const login = async (email: string, password: string) => {
+  const firebaseAuth = getAuthInstance();
 
-  const provider =
-    new GoogleAuthProvider();
+  return signInWithEmailAndPassword(firebaseAuth, email, password);
+};
 
+export const googleLogin = async () => {
+  const firebaseAuth = getAuthInstance();
+
+  const provider = new GoogleAuthProvider();
   provider.setCustomParameters({
     prompt: "select_account",
   });
 
-  return await signInWithPopup(
-    firebaseAuth,
-    provider
-  );
+  return signInWithPopup(firebaseAuth, provider);
 };
 
-const logout = async () => {
-  const firebaseAuth = getSafeAuth();
+export const logout = async () => {
+  const firebaseAuth = getAuthInstance();
   await signOut(firebaseAuth);
 };
-
-const authService = {
-  register,
-  login,
-  googleLogin,
-  logout,
-};
-
-export default authService;
