@@ -12,17 +12,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
 };
 
+// Prevent crash during SSR/build
 const isValid =
   firebaseConfig.apiKey &&
   firebaseConfig.authDomain &&
   firebaseConfig.projectId;
 
-if (!isValid && typeof window !== "undefined") {
-  console.error("❌ Firebase env missing on client");
+if (!isValid && typeof window === "undefined") {
+  console.warn("⚠ Firebase env missing during build (SSR safe mode)");
 }
 
-const app =
-  getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
