@@ -9,7 +9,9 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export default function AuthProvider({ children }: AuthProviderProps) {
+export default function AuthProvider({
+  children,
+}: AuthProviderProps) {
   const setUser = useAuthStore((state) => state.setUser);
   const setLoading = useAuthStore((state) => state.setLoading);
 
@@ -17,7 +19,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true);
 
     if (!auth) {
-      setUser(null);
       setLoading(false);
       return;
     }

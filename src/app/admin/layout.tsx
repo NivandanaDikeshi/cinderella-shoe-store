@@ -29,10 +29,17 @@ export default function AdminLayout({
 
     setLoading(true);
 
+    if (!auth) {
+      clearAdminData();
+      setLoading(false);
+      router.replace("/admin/login");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (!firebaseUser) {
-          await signOut(auth).catch(() => {});
+          if (auth) await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -43,7 +50,7 @@ export default function AdminLayout({
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
-          await signOut(auth).catch(() => {});
+          if (auth) await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -55,7 +62,7 @@ export default function AdminLayout({
 
         // allow only admin users
         if (roleCode !== 0 && roleCode !== 1) {
-          await signOut(auth).catch(() => {});
+          if (auth) await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -75,16 +82,10 @@ export default function AdminLayout({
     return () => unsubscribe();
   }, [isLoginPage, router, setLoading, clearAdminData, setAdminData]);
 
-  /* =========================
-     LOGIN PAGE (NO LAYOUT)
-  ========================= */
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  /* =========================
-     LOADING STATE (MODERN UI)
-  ========================= */
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-pink-50 to-pink-100">
