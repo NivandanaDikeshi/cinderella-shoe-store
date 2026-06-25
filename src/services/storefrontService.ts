@@ -22,12 +22,12 @@ export const getFeaturedProducts = async () => {
 
     const snapshot = await getDocs(q);
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    return snapshot.docs.map((productDoc) => ({
+      id: productDoc.id,
+      ...productDoc.data(),
     }));
   } catch (error) {
-    console.error("getFeaturedProducts:", error);
+    console.error("Error in getFeaturedProducts:", error);
     return [];
   }
 };
@@ -37,17 +37,21 @@ export const getFeaturedProducts = async () => {
  */
 export const getProductById = async (id: string) => {
   try {
+    if (!id) return null;
+
     const productRef = doc(db, "products", id);
     const snapshot = await getDoc(productRef);
 
-    if (!snapshot.exists()) return null;
+    if (!snapshot.exists()) {
+      return null;
+    }
 
     return {
       id: snapshot.id,
       ...snapshot.data(),
     };
   } catch (error) {
-    console.error("getProductById:", error);
+    console.error("Error in getProductById:", error);
     return null;
   }
 };
@@ -57,6 +61,8 @@ export const getProductById = async (id: string) => {
  */
 export const getRelatedProducts = async (category: string) => {
   try {
+    if (!category) return [];
+
     const q = query(
       collection(db, "products"),
       where("category", "==", category),
@@ -65,12 +71,12 @@ export const getRelatedProducts = async (category: string) => {
 
     const snapshot = await getDocs(q);
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    return snapshot.docs.map((productDoc) => ({
+      id: productDoc.id,
+      ...productDoc.data(),
     }));
   } catch (error) {
-    console.error("getRelatedProducts:", error);
+    console.error("Error in getRelatedProducts:", error);
     return [];
   }
 };
@@ -82,12 +88,12 @@ export const getAllProducts = async () => {
   try {
     const snapshot = await getDocs(collection(db, "products"));
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    return snapshot.docs.map((productDoc) => ({
+      id: productDoc.id,
+      ...productDoc.data(),
     }));
   } catch (error) {
-    console.error("getAllProducts:", error);
+    console.error("Error in getAllProducts:", error);
     return [];
   }
 };

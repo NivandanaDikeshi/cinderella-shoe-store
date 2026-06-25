@@ -9,12 +9,16 @@ import RelatedProducts from "@/components/storefront/RelatedProducts";
 import WishlistButton from "@/components/storefront/WishlistButton";
 import ProductReviewsSection from "@/components/reviews/ProductReviewsSection";
 
+interface ProductPageProps {
+  params: {
+    id: string;
+  };
+}
+
 export default async function ProductPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+}: ProductPageProps) {
+  const { id } = params;
 
   const product: any = await getProductById(id);
 
@@ -31,7 +35,7 @@ export default async function ProductPage({
     );
   }
 
-  const relatedProducts = await getRelatedProducts(product.category);
+  const relatedProducts = await getRelatedProducts(product.category || "");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
@@ -66,7 +70,9 @@ export default async function ProductPage({
           </h2>
 
           <RelatedProducts
-            products={relatedProducts.filter((p: any) => p.id !== product.id)}
+            products={(relatedProducts || []).filter(
+              (p: any) => p.id !== product.id
+            )}
           />
         </div>
       </div>
