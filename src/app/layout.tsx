@@ -28,16 +28,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
-      data-scroll-behavior="smooth"
     >
-      <body className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900">
+      <body className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         <AuthProvider>
           <LayoutClient>{children}</LayoutClient>
         </AuthProvider>

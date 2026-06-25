@@ -12,14 +12,13 @@ type LayoutClientProps = {
 export default function LayoutClient({ children }: LayoutClientProps) {
   const pathname = usePathname();
 
-  // Routes where Header/Footer should be hidden
   const hiddenRoutes = ["/login", "/register", "/home"];
 
   const hideLayout =
     hiddenRoutes.includes(pathname) || pathname.startsWith("/admin");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-inherit">
       {!hideLayout && <Header />}
 
       <main className="flex-1">{children}</main>
