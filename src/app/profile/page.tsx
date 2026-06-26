@@ -47,59 +47,56 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center px-4">
-
-      <div className="w-full max-w-2xl">
-
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-3xl">
         {/* HEADER */}
-        <div className="text-center mb-8">
-          <p className="text-xs tracking-[0.3em] uppercase text-pink-500 font-semibold">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pink-500">
             Account Settings
           </p>
 
-          <h1 className="text-4xl font-extrabold text-gray-900 mt-2">
+          <h1 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
             My Profile
           </h1>
 
-          <p className="text-gray-500 mt-2">
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
             Update your personal information and avatar
           </p>
         </div>
 
         {/* CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-gray-200 shadow-xl rounded-3xl p-8">
-
+        <div className="rounded-3xl border border-gray-200 bg-white/75 p-5 shadow-xl backdrop-blur-xl sm:p-8">
           {/* AVATAR SECTION */}
-          <div className="flex flex-col items-center mb-8">
-
-            <div className="relative group">
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="group relative">
               {photo ? (
                 <img
                   src={photo}
                   alt="Profile"
-                  className="w-28 h-28 rounded-full object-cover border-4 border-pink-200 shadow-md group-hover:scale-105 transition"
+                  className="h-24 w-24 rounded-full border-4 border-pink-200 object-cover shadow-md transition group-hover:scale-105 sm:h-28 sm:w-28"
                 />
               ) : (
-                <div className="w-28 h-28 rounded-full bg-pink-100 flex items-center justify-center border-4 border-pink-200">
+                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-pink-200 bg-pink-100 sm:h-28 sm:w-28">
                   <UserIcon className="text-pink-500" size={40} />
                 </div>
               )}
 
-              <div className="absolute bottom-2 right-2 bg-pink-600 p-2 rounded-full shadow-lg">
+              <div className="absolute bottom-1 right-1 rounded-full bg-pink-600 p-2 shadow-lg sm:bottom-2 sm:right-2">
                 <Camera size={14} className="text-white" />
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold mt-4 text-gray-900">
+            <h2 className="mt-4 text-2xl font-bold text-gray-900">
               {name || "Your Name"}
             </h2>
 
-            <p className="text-sm text-gray-500">{user?.email}</p>
+            <p className="max-w-full break-all text-sm text-gray-500">
+              {user?.email}
+            </p>
           </div>
 
           {/* FORM */}
           <div className="space-y-5">
-
             {/* NAME */}
             <div>
               <label className="text-sm font-medium text-gray-600">
@@ -109,7 +106,7 @@ export default function ProfilePage() {
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+                className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 transition focus:outline-none focus:ring-2 focus:ring-pink-400"
                 placeholder="Enter your full name"
               />
             </div>
@@ -123,7 +120,7 @@ export default function ProfilePage() {
               <input
                 value={photo}
                 onChange={(e) => setPhoto(e.target.value)}
-                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+                className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 transition focus:outline-none focus:ring-2 focus:ring-pink-400"
                 placeholder="Paste image URL (Cloudinary or Firebase)"
               />
             </div>
@@ -134,9 +131,9 @@ export default function ProfilePage() {
                 Email Address
               </label>
 
-              <div className="flex items-center gap-2 mt-2 px-4 py-3 rounded-xl bg-gray-100 text-gray-700">
-                <Mail size={16} className="text-pink-500" />
-                {user?.email}
+              <div className="mt-2 flex items-center gap-2 break-all rounded-xl bg-gray-100 px-4 py-3 text-gray-700">
+                <Mail size={16} className="shrink-0 text-pink-500" />
+                <span className="break-all">{user?.email}</span>
               </div>
             </div>
 
@@ -144,14 +141,13 @@ export default function ProfilePage() {
             <button
               onClick={handleUpdate}
               disabled={loading}
-              className="w-full mt-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 py-3 font-semibold text-white shadow-md transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Save size={18} />
               {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

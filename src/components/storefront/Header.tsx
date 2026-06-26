@@ -15,6 +15,7 @@ import {
   Home,
   Store,
   Phone,
+  Info,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
@@ -35,6 +36,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      setMobileOpen(false);
       router.push("/login");
     } catch (error) {
       console.error(error);
@@ -44,19 +46,19 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/shop", label: "Shop", icon: Store },
-    { href: "/about", label: "About", icon: User },
+    { href: "/about", label: "About", icon: Info },
     { href: "/contact", label: "Contact", icon: Phone },
   ];
 
   const isActive = (href: string) => pathname === href;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-pink-100/70 bg-white/80 backdrop-blur-xl shadow-sm">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-pink-100/70 bg-white/90 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between sm:h-20">
           {/* ================= LOGO ================= */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-pink-100 bg-white shadow-sm">
+          <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-pink-100 bg-white shadow-sm sm:h-12 sm:w-12">
               <Image
                 src="/logo.jpg"
                 alt="Cinderella Logo"
@@ -66,18 +68,18 @@ export default function Header() {
               />
             </div>
 
-            <div className="leading-tight">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900">
+            <div className="min-w-0 leading-tight">
+              <h1 className="truncate text-base font-extrabold tracking-tight text-gray-900 sm:text-xl md:text-2xl">
                 Cinderella
               </h1>
-              <p className="text-xs uppercase tracking-[0.25em] text-pink-500 font-semibold">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-[0.22em] text-pink-500 sm:text-xs sm:tracking-[0.25em]">
                 Shoe Store
               </p>
             </div>
           </Link>
 
           {/* ================= DESKTOP NAV ================= */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden items-center gap-2 lg:flex">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -127,8 +129,8 @@ export default function Header() {
             )}
           </nav>
 
-          {/* ================= RIGHT ACTIONS ================= */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* ================= DESKTOP RIGHT ACTIONS ================= */}
+          <div className="hidden items-center gap-3 lg:flex">
             {/* Wishlist */}
             <Link
               href="/wishlist"
@@ -160,8 +162,8 @@ export default function Header() {
             {/* Auth area */}
             {user ? (
               <div className="flex items-center gap-3 pl-2">
-                <div className="hidden xl:flex items-center gap-3 rounded-full border border-pink-100 bg-white px-3 py-2 shadow-sm">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-500 text-white font-bold">
+                <div className="hidden items-center gap-3 rounded-full border border-pink-100 bg-white px-3 py-2 shadow-sm xl:flex">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-500 font-bold text-white">
                     {user.displayName?.charAt(0)?.toUpperCase() ||
                       user.email?.charAt(0)?.toUpperCase() ||
                       "U"}
@@ -204,59 +206,66 @@ export default function Header() {
             )}
           </div>
 
-          {/* ================= MOBILE BUTTONS ================= */}
-          <div className="flex lg:hidden items-center gap-2">
+          {/* ================= MOBILE ACTIONS ================= */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {/* Wishlist */}
             <Link
               href="/wishlist"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-pink-100 bg-white"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-pink-100 bg-white text-gray-700 shadow-sm sm:h-10 sm:w-10"
+              aria-label="Wishlist"
             >
-              <Heart size={18} />
+              <Heart size={17} className="sm:h-[18px] sm:w-[18px]" />
               {wishlistItems.length > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-pink-600 px-1 text-[11px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-pink-600 px-1 text-[10px] font-bold text-white sm:min-w-[20px] sm:text-[11px]">
                   {wishlistItems.length}
                 </span>
               )}
             </Link>
 
+            {/* Cart */}
             <Link
               href="/cart"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-pink-100 bg-white"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-pink-100 bg-white text-gray-700 shadow-sm sm:h-10 sm:w-10"
+              aria-label="Cart"
             >
-              <ShoppingBag size={18} />
+              <ShoppingBag size={17} className="sm:h-[18px] sm:w-[18px]" />
               {cartItems.length > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-pink-600 px-1 text-[11px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-pink-600 px-1 text-[10px] font-bold text-white sm:min-w-[20px] sm:text-[11px]">
                   {cartItems.length}
                 </span>
               )}
             </Link>
 
+            {/* Menu button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-pink-100 bg-white shadow-sm"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-pink-100 bg-white text-gray-700 shadow-sm sm:h-10 sm:w-10"
               aria-label="Toggle Menu"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileOpen ? <X size={19} /> : <Menu size={19} />}
             </button>
           </div>
         </div>
 
         {/* ================= MOBILE MENU ================= */}
         {mobileOpen && (
-          <div className="lg:hidden pb-5">
-            <div className="mt-2 rounded-3xl border border-pink-100 bg-white p-4 shadow-xl">
+          <div className="pb-4 lg:hidden">
+            <div className="mt-2 rounded-2xl border border-pink-100 bg-white p-3 shadow-xl sm:rounded-3xl sm:p-4">
               {/* user info */}
               {user ? (
                 <div className="mb-4 flex items-center gap-3 rounded-2xl bg-pink-50 p-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-500 text-white font-bold">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-500 font-bold text-white">
                     {user.displayName?.charAt(0)?.toUpperCase() ||
                       user.email?.charAt(0)?.toUpperCase() ||
                       "U"}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-gray-900">
                       {user.displayName || "Customer"}
                     </p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                    <p className="truncate text-xs text-gray-500">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
               ) : null}
@@ -325,11 +334,11 @@ export default function Header() {
                     Logout
                   </button>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Link
                       href="/login"
                       onClick={() => setMobileOpen(false)}
-                      className="rounded-2xl border border-pink-200 px-4 py-3 text-center text-sm font-semibold text-pink-600 hover:bg-pink-50"
+                      className="rounded-2xl border border-pink-200 px-4 py-3 text-center text-sm font-semibold text-pink-600 transition hover:bg-pink-50"
                     >
                       Login
                     </Link>

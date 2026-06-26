@@ -1,80 +1,53 @@
-import {
-  getProductById,
-  getRelatedProducts,
-} from "@/services/storefrontService";
+import ProductReviews from "@/components/reviews/ProductReviews";
 
-import ProductGallery from "@/components/storefront/ProductGallery";
-import ProductInfo from "@/components/storefront/ProductInfo";
-import RelatedProducts from "@/components/storefront/RelatedProducts";
-import WishlistButton from "@/components/storefront/WishlistButton";
-import ProductReviewsSection from "@/components/reviews/ProductReviewsSection";
-
-interface ProductPageProps {
-  params: {
-    id: string;
-  };
+async function getProductById(id: string) {
+  const response = await fetch(`/api/products/${id}`);
+  if (!response.ok) return null;
+  return response.json();
 }
 
-export default async function ProductPage({
+export default async function Page({
   params,
-}: ProductPageProps) {
-  const { id } = params;
+}: {
+  params: { id: string };
+}) {
+  
+  const product = await getProductById(params.id);
 
-  const product: any = await getProductById(id);
-
+  // ❌ Not found UI
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="bg-white p-10 rounded-3xl shadow text-center max-w-md w-full">
-          <h1 className="text-3xl font-bold text-red-500">Product Not Found</h1>
-          <p className="mt-3 text-gray-500">
-            The product you are looking for does not exist.
-          </p>
-        </div>
+      <div className="text-center py-20">
+        <h1 className="text-red-500 text-2xl font-bold">
+          Product not found
+        </h1>
+        <p className="text-gray-500 mt-2">
+          Please check the URL or go back to shop.
+        </p>
       </div>
     );
   }
 
-  const relatedProducts = await getRelatedProducts(product.category || "");
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-12">
-          <div className="bg-white rounded-3xl shadow-sm border p-4">
-            <ProductGallery images={product.images || []} />
-          </div>
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      {/* PRODUCT INFO */}
+      <div className="border rounded-xl p-6 bg-white shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-900">
+          {product.name}
+        </h1>
 
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl shadow-sm border p-6">
-              <ProductInfo product={product} />
+        <p className="text-gray-600 mt-2">
+          {product.description}
+        </p>
 
-              <div className="mt-5">
-                <WishlistButton product={product} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <p className="text-xl font-semibold mt-4 text-pink-600">
+          Rs. {product.price}
+        </p>
+      </div>
 
-        <div className="mt-20">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">
-            Customer Reviews ⭐
-          </h2>
-
-          <ProductReviewsSection productId={product.id} />
-        </div>
-
-        <div className="mt-20">
-          <h2 className="text-3xl font-extrabold mb-8 text-gray-900">
-            You May Also Like
-          </h2>
-
-          <RelatedProducts
-            products={(relatedProducts || []).filter(
-              (p: any) => p.id !== product.id
-            )}
-          />
-        </div>
+      {/* REVIEWS SECTION */}
+      <div className="mt-10">
+        <ProductReviews productId={params.id} />
       </div>
     </div>
   );

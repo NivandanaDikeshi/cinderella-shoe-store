@@ -4,19 +4,19 @@ export default function ReviewSummary({ reviews }: any) {
   const avg =
     total === 0
       ? 0
-      : reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / total;
+      : reviews.reduce(
+          (sum: number, r: any) => sum + Number(r.rating || 0),
+          0
+        ) / total;
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-sm border mt-4">
-
-      <p className="text-lg font-bold">
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <p className="text-xl font-bold">
         ⭐ {avg.toFixed(1)} / 5
       </p>
-
-      <p className="text-gray-500 text-sm">
+      <p className="text-sm text-gray-500">
         {total} customer reviews
       </p>
-
     </div>
   );
 }

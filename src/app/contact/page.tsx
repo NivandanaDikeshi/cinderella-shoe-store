@@ -38,30 +38,28 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 flex items-center justify-center px-4 py-12">
-
-      <div className="w-full max-w-5xl grid md:grid-cols-2 gap-10">
-
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 md:gap-10">
         {/* LEFT SIDE - INFO */}
         <div className="flex flex-col justify-center">
-          <h1 className="text-5xl font-extrabold text-gray-900">
+          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
             Get in Touch 💬
           </h1>
 
-          <p className="text-gray-600 mt-4 text-lg leading-relaxed">
+          <p className="mt-4 text-base leading-relaxed text-gray-600 sm:text-lg">
             We’re here to help you with orders, support, and anything about
-            <span className="text-pink-600 font-semibold">
+            <span className="font-semibold text-pink-600">
               {" "}Cinderella Shoes
             </span>.
           </p>
 
-          <div className="mt-8 space-y-4 text-gray-700">
+          <div className="mt-8 space-y-3 text-sm text-gray-700 sm:text-base">
             <p>📍 Colombo, Sri Lanka</p>
             <p>📞 +94 77 123 4567</p>
             <p>✉ info@cinderellashoes.com</p>
           </div>
 
-          <div className="mt-10 p-5 bg-white/70 backdrop-blur-md rounded-2xl border border-pink-100 shadow-sm">
+          <div className="mt-8 rounded-2xl border border-pink-100 bg-white/70 p-5 shadow-sm backdrop-blur-md sm:mt-10">
             <p className="text-sm text-gray-500">
               💡 Tip: We usually respond within 24 hours.
             </p>
@@ -69,26 +67,24 @@ export default function ContactPage() {
         </div>
 
         {/* RIGHT SIDE - FORM */}
-        <div className="bg-white/80 backdrop-blur-lg border border-pink-100 shadow-2xl rounded-3xl p-8">
-
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="rounded-3xl border border-pink-100 bg-white/80 p-5 shadow-2xl backdrop-blur-lg sm:p-8">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
             Send us a message
           </h2>
 
           {success && (
-            <div className="mb-4 text-green-600 bg-green-50 border border-green-200 px-4 py-3 rounded-xl text-sm">
+            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-600">
               {success}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             <input
               type="text"
               placeholder="Your Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-400"
               required
             />
 
@@ -97,7 +93,7 @@ export default function ContactPage() {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-400"
               required
             />
 
@@ -106,19 +102,19 @@ export default function ContactPage() {
               placeholder="Write your message..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-400"
               required
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700 disabled:opacity-60"
             >
               {loading ? (
                 <>
                   <svg
-                    className="animate-spin h-5 w-5"
+                    className="h-5 w-5 animate-spin"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -142,10 +138,8 @@ export default function ContactPage() {
                 "Send Message ✉️"
               )}
             </button>
-
           </form>
         </div>
-
       </div>
     </div>
   );

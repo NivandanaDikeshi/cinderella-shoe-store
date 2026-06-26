@@ -2,107 +2,91 @@
 
 import Link from "next/link";
 import { Trash2, ShoppingBag } from "lucide-react";
-
 import useWishlistStore from "@/store/wishlistStore";
 
 export default function WishlistPage() {
   const { items, removeFromWishlist } = useWishlistStore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50 py-12 px-4">
-
-      <div className="max-w-7xl mx-auto">
-
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
         {/* HEADER */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900">
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
             My Wishlist ❤️
           </h1>
-          <p className="text-gray-500 mt-2">
-            Save your favorite shoes and shop them anytime
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
+            Save your favorite shoes and shop them anytime.
           </p>
         </div>
 
         {/* EMPTY STATE */}
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
-
-            <div className="text-6xl mb-4">💔</div>
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white px-6 py-20 text-center shadow-sm">
+            <div className="mb-4 text-5xl sm:text-6xl">💔</div>
 
             <h2 className="text-2xl font-bold text-gray-800">
               Your wishlist is empty
             </h2>
 
-            <p className="text-gray-500 mt-2 max-w-md">
-              Start adding shoes you love. Tap the heart icon while browsing products.
+            <p className="mt-2 max-w-md text-sm text-gray-500 sm:text-base">
+              Start adding shoes you love. Tap the heart icon while browsing
+              products.
             </p>
 
             <Link
               href="/shop"
-              className="mt-6 inline-flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-xl font-medium transition"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-pink-600 px-6 py-3 font-medium text-white transition hover:bg-pink-700"
             >
               <ShoppingBag size={18} />
               Continue Shopping
             </Link>
-
           </div>
         ) : (
-          <>
-            {/* GRID */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-
-              {items.map((product: any) => (
-                <div
-                  key={product.id}
-                  className="group bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
-                >
-
-                  {/* IMAGE */}
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={product.images?.[0] || "/placeholder.jpg"}
-                      alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-
-                  {/* CONTENT */}
-                  <div className="p-5">
-
-                    <h3 className="font-bold text-lg text-gray-900">
-                      {product.name}
-                    </h3>
-
-                    <p className="text-pink-600 font-extrabold text-lg mt-2">
-                      LKR {Number(product.price).toLocaleString()}
-                    </p>
-
-                    {/* VIEW BUTTON */}
-                    <Link
-                      href={`/product/${product.id}`}
-                      className="block mt-4 text-center bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-xl font-medium transition"
-                    >
-                      View Product
-                    </Link>
-
-                    {/* REMOVE BUTTON */}
-                    <button
-                      onClick={() => removeFromWishlist(product.id)}
-                      className="w-full mt-3 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-xl font-medium transition"
-                    >
-                      <Trash2 size={16} />
-                      Remove
-                    </button>
-
-                  </div>
-
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {items.map((product: any) => (
+              <div
+                key={product.id}
+                className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
+              >
+                {/* IMAGE */}
+                <div className="relative overflow-hidden">
+                  <img
+                    src={product.images?.[0] || "/placeholder.jpg"}
+                    alt={product.name}
+                    className="h-60 w-full object-cover transition-transform duration-500 group-hover:scale-105 sm:h-64"
+                  />
                 </div>
-              ))}
 
-            </div>
-          </>
+                {/* CONTENT */}
+                <div className="p-5">
+                  <h3 className="line-clamp-1 text-lg font-bold text-gray-900">
+                    {product.name}
+                  </h3>
+
+                  <p className="mt-2 text-lg font-extrabold text-pink-600">
+                    LKR {Number(product.price).toLocaleString()}
+                  </p>
+
+                  <Link
+                    href={`/product/${product.id}`}
+                    className="mt-4 block rounded-xl bg-pink-600 py-2.5 text-center font-medium text-white transition hover:bg-pink-700"
+                  >
+                    View Product
+                  </Link>
+
+                  <button
+                    onClick={() => removeFromWishlist(product.id)}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 py-2.5 font-medium text-red-600 transition hover:bg-red-100"
+                  >
+                    <Trash2 size={16} />
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
-
       </div>
     </div>
   );

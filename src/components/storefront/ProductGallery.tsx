@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 
 export default function ProductGallery({
@@ -8,39 +8,49 @@ export default function ProductGallery({
 }: {
   images: string[];
 }) {
-  const [selected, setSelected] =
-    useState(
-      images?.[0] || ""
-    );
+  const safeImages = useMemo(() => {
+    if (Array.isArray(images) && images.length > 0) return images;
+    return ["/placeholder.jpg"];
+  }, [images]);
+
+  const [selected, setSelected] = useState(safeImages[0]);
 
   return (
-    <div>
-      <Image
-        src={selected}
-        alt="Product"
-        width={600}
-        height={600}
-        className="w-full rounded-xl object-cover"
-      />
+    <div className="w-full">
+      {/* MAIN IMAGE */}
+      <div className="relative w-full overflow-hidden rounded-2xl bg-gray-100">
+        <Image
+          src={selected || "/placeholder.jpg"}
+          alt="Product"
+          width={800}
+          height={800}
+          className="h-[280px] w-full object-cover sm:h-[380px] md:h-[460px] lg:h-[520px]"
+          priority
+        />
+      </div>
 
-      <div className="grid grid-cols-4 gap-2 mt-4">
-        {images?.map(
-          (image, index) => (
+      {/* THUMBNAILS */}
+      <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+        {safeImages.map((image, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => setSelected(image)}
+            className={`overflow-hidden rounded-xl border bg-white transition ${
+              selected === image
+                ? "border-pink-500 ring-2 ring-pink-200"
+                : "border-gray-200 hover:border-pink-300"
+            }`}
+          >
             <Image
-              key={index}
               src={image}
-              alt=""
-              width={100}
-              height={100}
-              onClick={() =>
-                setSelected(
-                  image
-                )
-              }
-              className="cursor-pointer rounded border"
+              alt={`Thumbnail ${index + 1}`}
+              width={120}
+              height={120}
+              className="h-20 w-full object-cover sm:h-24"
             />
-          )
-        )}
+          </button>
+        ))}
       </div>
     </div>
   );

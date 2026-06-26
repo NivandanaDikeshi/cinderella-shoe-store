@@ -37,7 +37,6 @@ export default function ShopPage() {
     }
   };
 
-  // ✅ SAFE IMAGE FIX (VERY IMPORTANT)
   const getImage = (product: any) => {
     if (Array.isArray(product?.images) && product.images.length > 0) {
       return product.images[0];
@@ -103,61 +102,62 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
-
       {/* HEADER */}
-      <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
-        <h1 className="text-4xl font-extrabold text-gray-900">
+      <div className="mx-auto max-w-7xl px-4 pt-8 pb-6 sm:px-6 sm:pt-10 lg:px-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
           Shop Shoes 👠
         </h1>
-        <p className="text-gray-500 mt-2">
-          Discover premium shoes designed for comfort & style
+        <p className="mt-2 max-w-2xl text-sm text-gray-500 sm:text-base">
+          Discover premium shoes designed for comfort, elegance, and everyday
+          style.
         </p>
       </div>
 
-      {/* FILTER */}
-      <div className="max-w-7xl mx-auto px-4 mb-8 flex flex-col md:flex-row gap-4">
+      {/* FILTERS */}
+      <div className="mx-auto mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="w-full">
+            <ProductSearch search={search} setSearch={setSearch} />
+          </div>
 
-        <ProductSearch search={search} setSearch={setSearch} />
+          <div className="w-full">
+            <ProductFilters category={category} setCategory={setCategory} />
+          </div>
 
-        <ProductFilters category={category} setCategory={setCategory} />
-
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="border rounded-xl px-4 py-3"
-        >
-          <option value="">Sort</option>
-          <option value="low">Low → High</option>
-          <option value="high">High → Low</option>
-        </select>
-
+          <div className="w-full">
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-pink-400"
+            >
+              <option value="">Sort Products</option>
+              <option value="low">Price: Low → High</option>
+              <option value="high">Price: High → Low</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* PRODUCTS */}
-      <div className="max-w-7xl mx-auto px-4 pb-16">
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-
+      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
           {sortedProducts.length > 0 ? (
             sortedProducts.map((product) => {
               const sizes = Array.isArray(product.sizes) ? product.sizes : [];
               const colors = Array.isArray(product.colors) ? product.colors : [];
-
               const imageUrl = getImage(product);
 
               return (
                 <div
                   key={product.id}
-                  className="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden"
+                  className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
                 >
-
                   {/* IMAGE */}
                   <div className="relative">
-
                     <img
                       src={imageUrl}
                       alt={product.name}
-                      className="w-full h-64 object-cover"
+                      className="h-60 w-full object-cover sm:h-64"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "/placeholder.jpg";
                       }}
@@ -166,42 +166,41 @@ export default function ShopPage() {
                     {/* Wishlist */}
                     <button
                       onClick={() => toggleWishlist(product)}
-                      className={`absolute top-3 right-3 p-2 bg-white rounded-full ${
+                      className={`absolute right-3 top-3 rounded-full bg-white p-2 shadow-sm transition ${
                         isInWishlist(product.id)
                           ? "text-red-500"
-                          : "text-gray-600"
+                          : "text-gray-600 hover:text-pink-600"
                       }`}
+                      aria-label="Toggle wishlist"
                     >
                       <Heart
-                        size={20}
-                        fill={
-                          isInWishlist(product.id)
-                            ? "currentColor"
-                            : "none"
-                        }
+                        size={18}
+                        fill={isInWishlist(product.id) ? "currentColor" : "none"}
                       />
                     </button>
-
                   </div>
 
                   {/* CONTENT */}
-                  <div className="p-4">
+                  <div className="p-4 sm:p-5">
+                    <h3 className="line-clamp-1 text-lg font-bold text-gray-900">
+                      {product.name}
+                    </h3>
 
-                    <h3 className="font-bold text-lg">{product.name}</h3>
+                    <div className="mt-2">
+                      <ProductRating productId={product.id} />
+                    </div>
 
-                    <ProductRating productId={product.id} />
-
-                    <p className="text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       {product.category}
                     </p>
 
-                    <p className="text-pink-600 font-bold text-xl mt-2">
+                    <p className="mt-2 text-xl font-bold text-pink-600">
                       LKR {Number(product.price).toLocaleString()}
                     </p>
 
                     {/* SIZE */}
                     <select
-                      className="w-full border p-2 rounded mt-3"
+                      className="mt-3 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-pink-400"
                       value={selectedSizes[product.id] || ""}
                       onChange={(e) =>
                         setSelectedSizes({
@@ -224,7 +223,7 @@ export default function ShopPage() {
 
                     {/* COLOR */}
                     <select
-                      className="w-full border p-2 rounded mt-2"
+                      className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-pink-400"
                       value={selectedColors[product.id] || ""}
                       onChange={(e) =>
                         setSelectedColors({
@@ -246,47 +245,49 @@ export default function ShopPage() {
                     </select>
 
                     {/* QTY */}
-                    <div className="flex justify-between items-center mt-3 border p-2 rounded">
-
+                    <div className="mt-3 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2.5">
                       <button
                         onClick={() =>
                           updateQty(product.id, (quantities[product.id] || 1) - 1)
                         }
+                        className="rounded-md p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
+                        aria-label="Decrease quantity"
                       >
                         <Minus size={16} />
                       </button>
 
-                      <span>{quantities[product.id] || 1}</span>
+                      <span className="text-sm font-semibold text-gray-800">
+                        {quantities[product.id] || 1}
+                      </span>
 
                       <button
                         onClick={() =>
                           updateQty(product.id, (quantities[product.id] || 1) + 1)
                         }
+                        className="rounded-md p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
+                        aria-label="Increase quantity"
                       >
                         <Plus size={16} />
                       </button>
-
                     </div>
 
-                    {/* ADD */}
+                    {/* ADD TO CART */}
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="w-full mt-4 bg-pink-600 text-white py-2 rounded"
+                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-700"
                     >
-                      <ShoppingCart size={16} className="inline mr-2" />
+                      <ShoppingCart size={17} />
                       Add to Cart
                     </button>
-
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="col-span-full text-center py-20 text-gray-500">
+            <div className="col-span-full rounded-2xl bg-white/70 py-20 text-center text-gray-500 shadow-sm">
               No products found
             </div>
           )}
-
         </div>
       </div>
     </div>

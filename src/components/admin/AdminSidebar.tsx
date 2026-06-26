@@ -11,6 +11,7 @@ import {
   Package,
   Contact,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
 import { auth } from "@/lib/firebase/config";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
@@ -25,6 +26,7 @@ export default function AdminSidebar() {
     { label: "Products", href: "/admin/products", icon: ShoppingBag },
     { label: "Orders", href: "/admin/orders", icon: Package },
     { label: "Contacts", href: "/admin/contacts", icon: Contact },
+    { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
     { label: "Roles", href: "/admin/roles", icon: ShieldCheck },
     { label: "Manage Staff", href: "/admin/manage-staff", icon: Users },
   ];
@@ -43,110 +45,77 @@ export default function AdminSidebar() {
   };
 
   const handleLogout = async () => {
-    try {
-      if (!auth) {
-        console.error("Logout error: auth is not initialized");
-        return;
-      }
-      await signOut(auth);
-      clearAdminData();
-      router.push("/admin/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await signOut(auth);
+    clearAdminData();
+    router.push("/admin/login");
   };
 
   return (
     <aside className="w-[280px] min-h-screen flex flex-col
-      bg-gradient-to-b from-[#120A14] via-[#1A0F1F] to-[#0E0A10]
-      text-white border-r border-pink-500/10 shadow-2xl">
+      bg-white border-r border-pink-100 text-gray-800">
 
-      {/* ================= LOGO ================= */}
-      <div className="px-6 py-8 border-b border-pink-500/10">
-        <h1 className="text-3xl font-bold text-white tracking-wide">
+      {/* LOGO */}
+      <div className="px-6 py-7 border-b border-pink-100 bg-pink-50">
+        <h1 className="text-2xl font-bold text-pink-600">
           Cinderella
         </h1>
-
-        <p className="text-xs text-pink-300/70 mt-1 tracking-[0.25em] uppercase">
+        <p className="text-xs text-pink-400 tracking-[0.3em] uppercase mt-1">
           Admin Panel
         </p>
       </div>
 
-      {/* ================= NAVIGATION ================= */}
-      <nav className="flex-1 px-4 py-6 space-y-1">
-
+      {/* NAV */}
+      <nav className="flex-1 px-3 py-6 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-
-          const isActive =
-            item.href === "/admin/dashboard"
-              ? pathname === "/admin/dashboard"
-              : pathname.startsWith(item.href);
+          const isActive = pathname.startsWith(item.href);
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`
-                group relative flex items-center gap-3 px-4 py-3 rounded-xl
-                transition-all duration-200
-                ${
-                  isActive
-                    ? "text-pink-300 bg-white/5 border border-pink-500/20"
-                    : "text-gray-300 hover:text-pink-300 hover:bg-white/5"
-                }
-              `}
+              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition
+              ${
+                isActive
+                  ? "bg-pink-50 text-pink-600"
+                  : "text-gray-600 hover:bg-pink-50 hover:text-pink-600"
+              }`}
             >
+              {/* ACTIVE BAR */}
+              {isActive && (
+                <span className="absolute left-0 top-2 bottom-2 w-[3px] bg-pink-500 rounded-full" />
+              )}
 
-              {/* subtle glow */}
-              <span className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 bg-pink-500/5 transition" />
+              <Icon size={18} />
 
-              <Icon
-                size={18}
-                className={`relative z-10 transition ${
-                  isActive
-                    ? "text-pink-300"
-                    : "text-gray-400 group-hover:text-pink-300"
-                }`}
-              />
-
-              <span className="relative z-10 font-medium text-sm">
+              <span className="text-sm font-medium">
                 {item.label}
               </span>
-
             </Link>
           );
         })}
-
       </nav>
 
-      {/* ================= USER SECTION ================= */}
-      <div className="p-5 border-t border-pink-500/10 bg-white/5 backdrop-blur-md">
+      {/* USER */}
+      <div className="p-5 border-t border-pink-100 bg-pink-50">
+        <p className="text-sm text-gray-700 truncate">
+          {user?.email || "admin@cinderella.com"}
+        </p>
 
-        <div className="mb-3">
-          <p className="text-sm text-gray-200 truncate">
-            {user?.email || "admin@cinderella.com"}
-          </p>
-
-          <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full
-            bg-pink-500/10 text-pink-300 border border-pink-500/20">
-            {getRoleLabel(roleCode)}
-          </span>
-        </div>
+        <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full
+          bg-pink-100 text-pink-600 border border-pink-200">
+          {getRoleLabel(roleCode)}
+        </span>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2.5
-            rounded-xl bg-pink-500 text-black font-semibold
-            hover:bg-pink-400 hover:shadow-lg hover:shadow-pink-500/20
-            transition-all duration-200"
+          className="w-full mt-4 flex items-center justify-center gap-2 py-2.5
+            rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
         >
           <LogOut size={16} />
           Logout
         </button>
-
       </div>
-
     </aside>
   );
 }

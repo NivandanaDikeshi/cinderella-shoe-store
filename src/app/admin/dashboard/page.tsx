@@ -76,9 +76,7 @@ export default function AdminDashboardPage() {
 
   const totalProducts = products.length;
 
-  // =========================
   // STOCK CALCULATION (FIXED)
-  // =========================
   const getProductStock = (product: any) => {
     const stock = product.stock || {};
     return Object.values(stock).reduce(

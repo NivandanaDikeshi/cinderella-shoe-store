@@ -1,4 +1,3 @@
-import { db } from "@/lib/firebase/config";
 import {
   collection,
   addDoc,
@@ -6,18 +5,19 @@ import {
   query,
   where,
   orderBy,
-  serverTimestamp,
+  deleteDoc,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 
-// ➕ ADD REVIEW
+import { db } from "@/lib/firebase/config";
+
+// ADD REVIEW
 export const addReview = async (data: any) => {
-  return await addDoc(collection(db, "reviews"), {
-    ...data,
-    createdAt: serverTimestamp(),
-  });
+  return await addDoc(collection(db, "reviews"), data);
 };
 
-// 📥 GET REVIEWS FOR PRODUCT
+// GET REVIEWS BY PRODUCT
 export const getReviewsByProductId = async (productId: string) => {
   const q = query(
     collection(db, "reviews"),
@@ -25,10 +25,20 @@ export const getReviewsByProductId = async (productId: string) => {
     orderBy("createdAt", "desc")
   );
 
-  const snap = await getDocs(q);
+  const snapshot = await getDocs(q);
 
-  return snap.docs.map((doc) => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   }));
+};
+
+// UPDATE REVIEW
+export const updateReview = async (id: string, data: any) => {
+  await updateDoc(doc(db, "reviews", id), data);
+};
+
+// DELETE REVIEW
+export const deleteReview = async (id: string) => {
+  await deleteDoc(doc(db, "reviews", id));
 };

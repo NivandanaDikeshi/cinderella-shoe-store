@@ -1,32 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Star } from "lucide-react";
-
-import { useAuthStore } from "@/store/authStore";
+import { useState } from "react";
 import { addReview } from "@/services/reviewService";
+import { useAuthStore } from "@/store/authStore";
 
-interface Props {
-  productId: string;
-  reloadReviews: () => void;
-}
-
-export default function ReviewForm({ productId, reloadReviews }: Props) {
+export default function ReviewForm({
+  productId,
+  reloadReviews,
+}: any) {
   const { user } = useAuthStore();
 
   const [rating, setRating] = useState(5);
-  const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
   const handleSubmit = async () => {
+    if (!productId) return setMsg("❌ Missing product ID");
     if (!user) return setMsg("⚠️ Please login first");
-    if (!comment.trim()) return setMsg("⚠️ Write a review first");
+    if (!comment.trim()) return setMsg("⚠️ Write a comment");
 
     try {
       setLoading(true);
-      setMsg("");
 
       await addReview({
         productId,
@@ -34,17 +29,17 @@ export default function ReviewForm({ productId, reloadReviews }: Props) {
         userName: user.displayName || user.email,
         userPhoto: user.photoURL || "",
         rating,
-        comment,
+        comment: comment.trim(),
         createdAt: new Date().toISOString(),
       });
 
       setComment("");
       setRating(5);
 
-      reloadReviews(); // instant refresh
+      await reloadReviews();
+
       setMsg("✅ Review submitted!");
     } catch (err) {
-      console.error(err);
       setMsg("❌ Failed to submit review");
     } finally {
       setLoading(false);
@@ -52,62 +47,39 @@ export default function ReviewForm({ productId, reloadReviews }: Props) {
   };
 
   return (
-    <div className="mt-10 bg-white border border-gray-100 shadow-sm rounded-3xl p-6">
+    <div className="border rounded-xl p-4 bg-white">
+      <p className="text-sm text-gray-600">{msg}</p>
 
-      <h3 className="text-2xl font-bold mb-4">
-        Write a Review ✍️
-      </h3>
-
-      {/* MESSAGE */}
-      {msg && (
-        <div className="mb-4 text-sm bg-gray-50 border rounded-xl px-4 py-2 text-gray-700">
-          {msg}
-        </div>
-      )}
-
-      {/* STAR RATING */}
-      <div className="flex items-center gap-1 mb-4">
-        {[1, 2, 3, 4, 5].map((star) => (
+      {/* STARS */}
+      <div className="flex gap-2 mt-3">
+        {[1, 2, 3, 4, 5].map((s) => (
           <button
-            key={star}
-            onMouseEnter={() => setHover(star)}
-            onMouseLeave={() => setHover(0)}
-            onClick={() => setRating(star)}
+            key={s}
+            onClick={() => setRating(s)}
+            className={`text-2xl ${
+              s <= rating ? "text-yellow-400" : "text-gray-300"
+            }`}
           >
-            <Star
-              size={28}
-              className={
-                (hover || rating) >= star
-                  ? "text-yellow-400 fill-yellow-400"
-                  : "text-gray-300"
-              }
-            />
+            ★
           </button>
         ))}
-
-        <span className="ml-2 text-sm text-gray-500">
-          {rating}/5
-        </span>
       </div>
 
       {/* COMMENT */}
       <textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        rows={4}
-        placeholder="Share your experience..."
-        className="w-full border rounded-2xl p-4 focus:ring-2 focus:ring-pink-400 outline-none"
+        className="w-full border mt-3 p-2 rounded"
+        placeholder="Write your review..."
       />
 
-      {/* BUTTON */}
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full mt-4 bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-2xl font-semibold transition"
+        className="mt-3 bg-pink-600 text-white px-4 py-2 rounded"
       >
         {loading ? "Submitting..." : "Submit Review"}
       </button>
-
     </div>
   );
 }
