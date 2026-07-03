@@ -7,11 +7,9 @@ export interface CartItem {
   price: number;
   image: string;
 
-  // selected variant
   size: string;
   color: string;
 
-  // available variants
   sizes: string[];
   colors: string[];
 
@@ -22,7 +20,6 @@ interface CartStore {
   items: CartItem[];
 
   addToCart: (item: CartItem) => void;
-
   removeFromCart: (id: string, size: string, color: string) => void;
 
   updateCartItem: (
@@ -33,6 +30,9 @@ interface CartStore {
   ) => void;
 
   getTotal: () => number;
+
+  // ✅ ADD THIS
+  clearCart: () => void;
 }
 
 const useCartStore = create<CartStore>()(
@@ -40,7 +40,6 @@ const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
 
-      // ADD ITEM (avoid duplicates)
       addToCart: (item) =>
         set((state) => {
           const existing = state.items.find(
@@ -62,12 +61,9 @@ const useCartStore = create<CartStore>()(
             };
           }
 
-          return {
-            items: [...state.items, item],
-          };
+          return { items: [...state.items, item] };
         }),
 
-      // REMOVE ITEM
       removeFromCart: (id, size, color) =>
         set((state) => ({
           items: state.items.filter(
@@ -76,7 +72,6 @@ const useCartStore = create<CartStore>()(
           ),
         })),
 
-      // UPDATE ITEM (SAFE)
       updateCartItem: (id, size, color, updates) =>
         set((state) => ({
           items: state.items.map((item) =>
@@ -88,12 +83,14 @@ const useCartStore = create<CartStore>()(
           ),
         })),
 
-      // TOTAL
       getTotal: () =>
         get().items.reduce(
           (total, item) => total + item.price * item.quantity,
           0
         ),
+
+      // ✅ CLEAR CART FUNCTION
+      clearCart: () => set({ items: [] }),
     }),
     {
       name: "cart-storage",
