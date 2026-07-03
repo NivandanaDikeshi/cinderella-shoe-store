@@ -2,37 +2,46 @@ import {
   collection,
   getDocs,
   getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   doc,
 } from "firebase/firestore";
 
 import { db } from "@/lib/firebase/config";
 
-// GET ALL
+// SAFE GET ALL PRODUCTS
 export const getProducts = async () => {
-  const snapshot = await getDocs(collection(db, "products"));
+  try {
+    if (!db) return [];
 
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  }));
+    const snapshot = await getDocs(collection(db, "products"));
+
+    return snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+  } catch (error) {
+    console.error("getProducts error:", error);
+    return [];
+  }
 };
 
-// GET BY ID (FIXED)
+// SAFE GET PRODUCT BY ID
 export const getProductById = async (id: string) => {
-  if (!id) return null;
+  try {
+    if (!id || !db) return null;
 
-  const docRef = doc(db, "products", id);
-  const snapshot = await getDoc(docRef);
+    const docRef = doc(db, "products", id);
+    const snapshot = await getDoc(docRef);
 
-  if (!snapshot.exists()) return null;
+    if (!snapshot.exists()) return null;
 
-  return {
-    id: snapshot.id,
-    ...snapshot.data(),
-  };
+    return {
+      id: snapshot.id,
+      ...snapshot.data(),
+    };
+  } catch (error) {
+    console.error("getProductById error:", error);
+    return null;
+  }
 };
 
 export default {
