@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
@@ -50,7 +52,7 @@ export default function ShopPage() {
     return "/placeholder.jpg";
   };
 
-  // ✅ FIXED CART FUNCTION
+  // CART
   const handleAddToCart = (product: any) => {
     addToCart({
       id: product.id,
@@ -58,7 +60,6 @@ export default function ShopPage() {
       price: Number(product.price),
       image: getImage(product),
 
-      // safe fallback
       size: product.sizes?.[0] || "",
       color: product.colors?.[0] || "",
 
