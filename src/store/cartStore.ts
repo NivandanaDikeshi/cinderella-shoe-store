@@ -10,7 +10,6 @@ export interface CartItem {
   size: string;
   color: string;
 
-  // available options
   sizes: string[];
   colors: string[];
 
@@ -21,7 +20,6 @@ interface CartStore {
   items: CartItem[];
 
   addToCart: (item: CartItem) => void;
-
   removeFromCart: (id: string, size: string, color: string) => void;
 
   updateCartItem: (
@@ -32,7 +30,6 @@ interface CartStore {
   ) => void;
 
   getTotal: () => number;
-
   clearCart: () => void;
 }
 
@@ -41,7 +38,7 @@ const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
 
-      // ADD TO CART
+      // ADD TO CART (merge same variant)
       addToCart: (item) =>
         set((state) => {
           const existing = state.items.find(
