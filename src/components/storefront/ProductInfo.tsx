@@ -23,9 +23,14 @@ export default function ProductInfo({ product }: any) {
       name: product.name,
       price: Number(product.price),
       image: product.images?.[0] || "/placeholder.jpg",
+
       size,
       color,
       quantity: qty,
+
+      // ✅ FIX: REQUIRED FIELDS ADDED
+      sizes: product.sizes || [],
+      colors: product.colors || [],
     });
 
     setQty(1);
@@ -36,8 +41,9 @@ export default function ProductInfo({ product }: any) {
 
   return (
     <div className="w-full">
+
       {/* TITLE */}
-      <h1 className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl lg:text-4xl">
+      <h1 className="text-2xl font-extrabold text-gray-900 sm:text-3xl lg:text-4xl">
         {product.name}
       </h1>
 
@@ -52,13 +58,13 @@ export default function ProductInfo({ product }: any) {
       </div>
 
       {/* DESCRIPTION */}
-      <p className="mt-5 text-sm leading-7 text-gray-600 sm:text-base">
+      <p className="mt-5 text-sm text-gray-600 sm:text-base">
         {product.description || "No description available for this product."}
       </p>
 
       {/* SIZE */}
       <div className="mt-8">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-800 sm:text-base">
+        <h3 className="mb-3 text-sm font-semibold uppercase text-gray-800">
           Size
         </h3>
 
@@ -68,10 +74,10 @@ export default function ProductInfo({ product }: any) {
               <button
                 key={s}
                 onClick={() => setSize(s)}
-                className={`min-w-[52px] rounded-xl border px-4 py-2 text-sm font-medium transition sm:px-5 sm:py-2.5 ${
+                className={`px-4 py-2 rounded-xl border transition ${
                   size === s
-                    ? "border-pink-600 bg-pink-600 text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-pink-400"
+                    ? "bg-pink-600 text-white border-pink-600"
+                    : "bg-white text-gray-700 hover:border-pink-400"
                 }`}
               >
                 {s}
@@ -85,7 +91,7 @@ export default function ProductInfo({ product }: any) {
 
       {/* COLOR */}
       <div className="mt-8">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-800 sm:text-base">
+        <h3 className="mb-3 text-sm font-semibold uppercase text-gray-800">
           Color
         </h3>
 
@@ -95,10 +101,10 @@ export default function ProductInfo({ product }: any) {
               <button
                 key={c}
                 onClick={() => setColor(c)}
-                className={`rounded-xl border px-4 py-2 text-sm font-medium transition sm:px-5 sm:py-2.5 ${
+                className={`px-4 py-2 rounded-xl border transition ${
                   color === c
-                    ? "border-pink-600 bg-pink-600 text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-pink-400"
+                    ? "bg-pink-600 text-white border-pink-600"
+                    : "bg-white text-gray-700 hover:border-pink-400"
                 }`}
               >
                 {c}
@@ -112,26 +118,18 @@ export default function ProductInfo({ product }: any) {
 
       {/* QUANTITY */}
       <div className="mt-8">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-800 sm:text-base">
+        <h3 className="mb-3 text-sm font-semibold uppercase text-gray-800">
           Quantity
         </h3>
 
-        <div className="flex w-full max-w-[170px] items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-2 shadow-sm">
-          <button
-            onClick={decreaseQty}
-            className="rounded-lg p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
-          >
+        <div className="flex items-center justify-between w-[170px] border rounded-xl px-3 py-2">
+          <button onClick={decreaseQty}>
             <Minus size={18} />
           </button>
 
-          <span className="min-w-[30px] text-center text-base font-semibold text-gray-900">
-            {qty}
-          </span>
+          <span className="font-semibold">{qty}</span>
 
-          <button
-            onClick={increaseQty}
-            className="rounded-lg p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
-          >
+          <button onClick={increaseQty}>
             <Plus size={18} />
           </button>
         </div>
@@ -141,14 +139,16 @@ export default function ProductInfo({ product }: any) {
       {typeof product.stock === "number" && (
         <div className="mt-5 text-sm text-gray-500">
           Available Stock:{" "}
-          <span className="font-semibold text-gray-700">{product.stock}</span>
+          <span className="font-semibold text-gray-700">
+            {product.stock}
+          </span>
         </div>
       )}
 
       {/* ADD TO CART */}
       <button
         onClick={addToCart}
-        className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-pink-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-pink-700 sm:w-auto sm:min-w-[220px]"
+        className="mt-8 flex items-center gap-2 bg-pink-600 text-white px-6 py-3 rounded-xl hover:bg-pink-700"
       >
         <ShoppingCart size={18} />
         Add To Cart
