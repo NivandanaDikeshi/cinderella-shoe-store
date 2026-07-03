@@ -285,8 +285,8 @@ export default function OrderManagementPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-11 h-11 rounded-2xl bg-pink-50 flex items-center justify-center">
-              <ShoppingBag className="text-pink-600" size={20} />
+            <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center">
+              <ShoppingBag className="text-gray-600" size={20} />
             </div>
             <span className="text-xs font-semibold text-slate-400 uppercase">
               Total
@@ -351,7 +351,7 @@ export default function OrderManagementPage() {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition ${
                 activeTab === tab
-                  ? "bg-slate-900 text-pink-500"
+                  ? "bg-slate-900 text-white border border-slate-500"
                   : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
               }`}
             >
@@ -370,7 +370,7 @@ export default function OrderManagementPage() {
             placeholder="Search order ID, customer, email, phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-pink-400 focus:bg-white transition"
+            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-slate-400 focus:bg-white transition"
           />
         </div>
       </div>
@@ -480,7 +480,7 @@ export default function OrderManagementPage() {
                     <td className="p-5 align-middle text-right">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-900 hover:text-pink-500 text-slate-900 border border-slate-200 text-xs font-bold rounded-xl transition"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-900 hover:text-slate-500 text-slate-900 border border-slate-200 text-xs font-bold rounded-xl transition"
                       >
                         <Eye size={16} />
                         View
@@ -519,7 +519,7 @@ export default function OrderManagementPage() {
                       onClick={() => setCurrentPage(page)}
                       className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold transition ${
                         currentPage === page
-                          ? "bg-slate-900 text-pink-500"
+                          ? "bg-slate-900 text-white border border-slate-500"
                           : "text-slate-600 hover:bg-slate-50"
                       }`}
                     >
@@ -550,7 +550,7 @@ export default function OrderManagementPage() {
             {/* MODAL HEADER */}
             <div className="flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50">
               <div>
-                <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-pink-600">
+                <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-600">
                   Order Details
                 </p>
                 <h2 className="text-2xl font-bold text-slate-900 mt-1">
@@ -576,7 +576,7 @@ export default function OrderManagementPage() {
                 {/* CUSTOMER */}
                 <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <User size={18} className="text-pink-600" />
+                    <User size={18} className="text-slate-600" />
                     <h3 className="font-bold text-sm uppercase tracking-wider text-slate-900">
                       Customer
                     </h3>
@@ -628,7 +628,7 @@ export default function OrderManagementPage() {
                 {/* ORDER META */}
                 <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <Calendar size={18} className="text-pink-600" />
+                    <Calendar size={18} className="text-slate-600" />
                     <h3 className="font-bold text-sm uppercase tracking-wider text-slate-900">
                       Order Info
                     </h3>
@@ -680,7 +680,7 @@ export default function OrderManagementPage() {
                 {/* TOTALS */}
                 <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <CircleDollarSign size={18} className="text-pink-600" />
+                    <CircleDollarSign size={18} className="text-slate-600" />
                     <h3 className="font-bold text-sm uppercase tracking-wider text-slate-900">
                       Payment Summary
                     </h3>
@@ -709,7 +709,7 @@ export default function OrderManagementPage() {
                       <span className="font-bold uppercase tracking-wider text-slate-900">
                         Grand Total
                       </span>
-                      <span className="text-2xl font-bold text-pink-600">
+                      <span className="text-2xl font-bold text-slate-900">
                         LKR {getOrderTotal(selectedOrder).toLocaleString()}
                       </span>
                     </div>
@@ -720,7 +720,7 @@ export default function OrderManagementPage() {
               {/* ITEMS TABLE */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Package size={18} className="text-pink-600" />
+                  <Package size={18} className="text-slate-600" />
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-900">
                     Purchased Items
                   </h3>

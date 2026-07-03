@@ -232,10 +232,10 @@ export default function ProductForm() {
 
   return (
     // ✅ FULL SCREEN WRAPPER FIXED
-    <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-pink-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-50">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-10 border-b border-pink-100 bg-white/80 backdrop-blur px-6 py-5">
+      <div className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur px-6 py-5">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Create Shoe Product</h1>
@@ -244,7 +244,7 @@ export default function ProductForm() {
             </p>
           </div>
 
-          <div className="text-sm font-semibold text-pink-600">
+          <div className="text-sm font-semibold text-gray-600">
             Stock: {totalStock}
           </div>
         </div>
@@ -382,7 +382,7 @@ export default function ProductForm() {
 
             <div className="flex flex-wrap gap-2 mt-3">
               {colors.map((c) => (
-                <span key={c} className="bg-pink-100 px-3 py-1 rounded-full text-sm">
+                <span key={c} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                   {c}
                   <button onClick={() => removeColor(c)} className="ml-2 text-red-500">x</button>
                 </span>
@@ -394,7 +394,7 @@ export default function ProductForm() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-pink-600 text-white py-3 rounded-xl font-bold"
+            className="w-full bg-gray-700 hover:bg-gray-800 active:bg-gray-900 text-white py-3 rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
           >
             {loading ? "Saving..." : "Create Product"}
           </button>

@@ -6,7 +6,7 @@ interface DashboardCardProps {
   title: string;
   value: string | number;
   valueClassName?: string;
-  icon?: ReactNode; 
+  icon?: ReactNode;
   subtitle?: string;
 }
 
@@ -21,47 +21,48 @@ export default function DashboardCard({
     <div
       className="
         relative overflow-hidden
-        rounded-2xl border border-pink-100
-        bg-gradient-to-br from-white via-white to-pink-50
+        rounded-2xl border border-gray-200
+        bg-white
         p-6 shadow-sm
         transition-all duration-300
-        hover:shadow-xl hover:-translate-y-1
+        hover:shadow-md hover:-translate-y-1
       "
     >
-      {/* soft glow effect */}
-      <div className="absolute -top-10 -right-10 w-36 h-36 bg-pink-200 blur-3xl opacity-30 rounded-full" />
 
-      {/* header row */}
-      <div className="flex items-center justify-between">
+      {/* TOP ROW */}
+      <div className="flex items-start justify-between">
+
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
             {title}
           </p>
 
           {subtitle && (
-            <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {subtitle}
+            </p>
           )}
         </div>
 
-        {/* icon */}
+        {/* ICON (CLEAN STYLE) */}
         {icon && (
-          <div className="p-2 rounded-xl bg-pink-100 text-pink-600 shadow-sm">
+          <div className="p-2 rounded-xl bg-gray-100 text-gray-700 border border-gray-200">
             {icon}
           </div>
         )}
       </div>
 
-      {/* value */}
+      {/* VALUE */}
       <h2
         className={`text-3xl font-bold mt-4 tracking-tight text-gray-900 ${valueClassName}`}
       >
         {value}
       </h2>
 
-      {/* bottom accent */}
+      {/* BOTTOM MINI INDICATOR */}
       <div className="mt-5 flex items-center gap-2">
-        <div className="h-[3px] w-10 rounded-full bg-pink-500" />
-        <div className="h-[3px] w-3 rounded-full bg-pink-200" />
+        <div className="h-[3px] w-10 rounded-full bg-gray-900" />
+        <div className="h-[3px] w-3 rounded-full bg-gray-300" />
       </div>
     </div>
   );

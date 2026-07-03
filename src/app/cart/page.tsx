@@ -1,133 +1,208 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2, ShoppingBag } from "lucide-react";
+import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import useCartStore from "@/store/cartStore";
 
 export default function CartPage() {
-  const { items, getTotal, removeFromCart } = useCartStore();
+  const { items, getTotal, removeFromCart, updateCartItem } =
+    useCartStore() as any;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 px-4 py-10 sm:px-6 lg:px-8">
+
+      <div className="mx-auto max-w-7xl">
+
         {/* HEADER */}
-        <h1 className="mb-8 text-3xl font-extrabold text-gray-900 sm:mb-10 sm:text-4xl">
-          Shopping Cart 🛒
-        </h1>
+        <div className="mb-10">
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
+            Shopping Cart 🛒
+          </h1>
+          <p className="mt-2 text-sm text-gray-500">
+            Review your selected items before checkout.
+          </p>
+        </div>
 
         {/* EMPTY STATE */}
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-6 py-20 text-center shadow-sm sm:py-24">
-            <ShoppingBag size={56} className="mb-4 text-gray-300 sm:size-[60px]" />
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white/70 backdrop-blur-md px-6 py-24 text-center shadow-xl">
+
+            <div className="text-6xl mb-4">🛒</div>
 
             <h2 className="text-2xl font-bold text-gray-800">
               Your cart is empty
             </h2>
 
-            <p className="mt-2 max-w-md text-sm text-gray-500 sm:text-base">
-              Start shopping to add your favorite shoes here.
+            <p className="mt-2 max-w-md text-sm text-gray-500">
+              Looks like you haven’t added anything yet.
             </p>
 
             <Link
               href="/shop"
-              className="mt-6 rounded-xl bg-pink-600 px-6 py-3 font-medium text-white transition hover:bg-pink-700"
+              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-pink-600 px-6 py-3 font-medium text-white shadow-md transition hover:bg-pink-700 hover:scale-105"
             >
-              Continue Shopping
+              <ShoppingBag size={18} />
+              Start Shopping
             </Link>
+
           </div>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-3 lg:gap-10">
-            {/* CART ITEMS */}
-            <div className="space-y-5 lg:col-span-2 sm:space-y-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+
+            {/* ITEMS */}
+            <div className="lg:col-span-2 space-y-6">
+
               {items.map((item: any) => (
                 <div
                   key={`${item.id}-${item.size}-${item.color}`}
-                  className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-md transition hover:shadow-lg sm:flex-row sm:gap-5 sm:p-5"
+                  className="group flex gap-5 rounded-3xl bg-white/80 backdrop-blur-md p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
+
                   {/* IMAGE */}
-                  <div className="h-24 w-full overflow-hidden rounded-xl bg-gray-100 sm:w-24 shrink-0">
-                    {item.image || item.images?.[0] ? (
-                      <img
-                        src={item.image || item.images?.[0]}
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
+                  <img
+                    src={item.image}
+                    className="h-28 w-28 rounded-2xl object-cover"
+                  />
 
                   {/* DETAILS */}
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">
+                  <div className="flex-1 space-y-2">
+
+                    <h2 className="text-lg font-bold text-gray-900 line-clamp-1">
                       {item.name}
-                    </h3>
+                    </h2>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                      Size: {item.size} • Color: {item.color || "N/A"}
-                    </p>
+                    <div className="inline-flex rounded-full bg-pink-50 px-3 py-1 text-sm font-semibold text-pink-600">
+                      LKR {item.price}
+                    </div>
 
-                    <p className="mt-2 font-bold text-pink-600">
-                      LKR {Number(item.price).toLocaleString()}
-                    </p>
+                    {/* SIZE */}
+                    {item.sizes?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mt-2">Sizes</p>
 
-                    <div className="mt-3 text-sm font-medium text-gray-700">
-                      Quantity: {item.quantity}
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {item.sizes.map((s: string) => (
+                            <button
+                              key={s}
+                              onClick={() =>
+                                updateCartItem(item.id, item.size, item.color, {
+                                  size: s,
+                                })
+                              }
+                              className={`px-3 py-1 rounded-xl text-xs border transition ${
+                                item.size === s
+                                  ? "bg-pink-600 text-white border-pink-600"
+                                  : "hover:border-pink-400"
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* COLOR */}
+                    {item.colors?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mt-2">Colors</p>
+
+                        <div className="flex gap-2 mt-1">
+                          {item.colors.map((c: string) => (
+                            <button
+                              key={c}
+                              onClick={() =>
+                                updateCartItem(item.id, item.size, item.color, {
+                                  color: c,
+                                })
+                              }
+                              className={`h-6 w-6 rounded-full border-2 transition ${
+                                item.color === c
+                                  ? "border-black scale-110"
+                                  : "border-gray-300"
+                              }`}
+                              style={{ backgroundColor: c.toLowerCase() }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* QUANTITY */}
+                    <div className="flex items-center gap-3 pt-2">
+
+                      {/* MINUS (cannot go below 1) */}
+                      <button
+                        disabled={item.quantity <= 1}
+                        onClick={() =>
+                          updateCartItem(item.id, item.size, item.color, {
+                            quantity: Math.max(1, item.quantity - 1),
+                          })
+                        }
+                        className={`rounded-xl border p-2 transition ${
+                          item.quantity <= 1
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-pink-50"
+                        }`}
+                      >
+                        <Minus size={16} />
+                      </button>
+
+                      <span className="font-semibold">
+                        {item.quantity}
+                      </span>
+
+                      {/* PLUS */}
+                      <button
+                        onClick={() =>
+                          updateCartItem(item.id, item.size, item.color, {
+                            quantity: item.quantity + 1,
+                          })
+                        }
+                        className="rounded-xl border p-2 hover:bg-pink-50 transition"
+                      >
+                        <Plus size={16} />
+                      </button>
+
                     </div>
                   </div>
 
                   {/* REMOVE */}
-                  <div className="flex justify-end sm:justify-start">
-                    <button
-                      onClick={() =>
-                        removeFromCart(item.id, item.size, item.color)
-                      }
-                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-red-500 transition hover:bg-red-50 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                      <span className="sm:hidden">Remove</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() =>
+                      removeFromCart(item.id, item.size, item.color)
+                    }
+                    className="rounded-xl bg-red-50 px-3 py-2 text-red-500 transition hover:bg-red-100 hover:scale-105"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+
                 </div>
               ))}
             </div>
 
             {/* SUMMARY */}
-            <div className="lg:col-span-1">
-              <div className="rounded-3xl bg-white p-6 shadow-md lg:sticky lg:top-24">
-                <h2 className="mb-5 text-xl font-bold text-gray-900">
-                  Order Summary
-                </h2>
+            <div className="rounded-3xl bg-white/80 backdrop-blur-md p-6 shadow-md h-fit">
 
-                <div className="mb-3 flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>LKR {Number(getTotal()).toLocaleString()}</span>
-                </div>
+              <h2 className="text-xl font-bold mb-4 text-gray-900">
+                Order Summary
+              </h2>
 
-                <div className="mb-3 flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-
-                <hr className="my-4" />
-
-                <div className="flex justify-between text-lg font-bold text-gray-900">
-                  <span>Total</span>
-                  <span className="text-pink-600">
-                    LKR {Number(getTotal()).toLocaleString()}
-                  </span>
-                </div>
-
-                <Link
-                  href="/checkout"
-                  className="mt-6 block rounded-xl bg-pink-600 py-3 text-center font-semibold text-white transition hover:bg-pink-700"
-                >
-                  Proceed to Checkout
-                </Link>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Total</span>
+                <span className="text-pink-600 font-bold text-lg">
+                  LKR {getTotal()}
+                </span>
               </div>
+
+              <Link
+                href="/checkout"
+                className="mt-6 block rounded-2xl bg-pink-600 py-3 text-center font-medium text-white shadow-md transition hover:bg-pink-700 hover:scale-105"
+              >
+                Checkout
+              </Link>
             </div>
+
           </div>
         )}
       </div>

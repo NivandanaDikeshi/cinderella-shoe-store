@@ -76,7 +76,7 @@ export default function ReviewForm({
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="mt-3 bg-pink-600 text-white px-4 py-2 rounded"
+        className="mt-3 bg-gray-600 text-white px-4 py-2 rounded"
       >
         {loading ? "Submitting..." : "Submit Review"}
       </button>

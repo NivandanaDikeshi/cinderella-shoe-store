@@ -1,7 +1,7 @@
 "use client";
 
 export default function OrderTracking({ status }: { status: string }) {
-  const steps = ["Pending", "Processing", "Shipped", "Delivered"];
+  const steps = ["Pending", "Processing", "Dispatched", "Completed"];
 
   const currentIndex = steps.indexOf(status);
 

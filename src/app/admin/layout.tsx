@@ -29,17 +29,10 @@ export default function AdminLayout({
 
     setLoading(true);
 
-    if (!auth) {
-      clearAdminData();
-      setLoading(false);
-      router.replace("/admin/login");
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (!firebaseUser) {
-          if (auth) await signOut(auth).catch(() => {});
+          await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -50,7 +43,7 @@ export default function AdminLayout({
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
-          if (auth) await signOut(auth).catch(() => {});
+          await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -60,9 +53,8 @@ export default function AdminLayout({
         const userData = userSnap.data();
         const roleCode = Number(userData.roleCode);
 
-        // allow only admin users
         if (roleCode !== 0 && roleCode !== 1) {
-          if (auth) await signOut(auth).catch(() => {});
+          await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
           router.replace("/admin/login");
@@ -82,16 +74,22 @@ export default function AdminLayout({
     return () => unsubscribe();
   }, [isLoginPage, router, setLoading, clearAdminData, setAdminData]);
 
+  /* =========================
+     LOGIN PAGE
+  ========================= */
   if (isLoginPage) {
     return <>{children}</>;
   }
 
+  /* =========================
+     LOADING UI (MODERN MINIMAL)
+  ========================= */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-pink-50 to-pink-100">
-        <div className="text-center space-y-3">
-          <div className="w-10 h-10 mx-auto border-4 border-pink-400 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-pink-600 font-medium">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f5f7]">
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 mx-auto border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">
             Loading Admin Panel...
           </p>
         </div>
@@ -103,7 +101,7 @@ export default function AdminLayout({
      MAIN ADMIN LAYOUT
   ========================= */
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-[#fff] via-pink-50 to-pink-100">
+    <div className="min-h-screen flex bg-[#f4f5f7] text-gray-900">
 
       {/* SIDEBAR */}
       <AdminSidebar />

@@ -10,7 +10,7 @@ export default function OrderTrackingTimeline({ status }: Props) {
   const steps = [
     { label: "Order Placed", icon: Package },
     { label: "Processing", icon: Package },
-    { label: "Shipped", icon: Truck },
+    { label: "Dispatched", icon: Truck },
     { label: "Delivered", icon: Home },
   ];
 
@@ -22,7 +22,7 @@ export default function OrderTrackingTimeline({ status }: Props) {
         return 1;
       case "Dispatched":
         return 2;
-      case "Completed":
+      case "Delivered":
         return 3;
       default:
         return 0;

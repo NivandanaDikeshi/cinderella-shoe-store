@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import productService from "@/services/productService";
+import { db } from "@/lib/firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
 import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function EditProductPage() {
@@ -101,7 +103,8 @@ export default function EditProductPage() {
     try {
       setSaving(true);
 
-      await productService.updateProduct(id, product);
+      const productRef = doc(db, "products", id);
+      await updateDoc(productRef, product);
 
       alert("Product updated successfully");
       router.push("/admin/products");
@@ -122,16 +125,16 @@ export default function EditProductPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-pink-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-50">
 
       {/* HEADER */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-pink-100 px-6 py-5">
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-100 px-6 py-5">
         <div className="flex items-center justify-between">
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 rounded-lg border border-pink-200 hover:bg-pink-50"
+              className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
             >
               <ArrowLeft size={18} />
             </button>
@@ -146,7 +149,7 @@ export default function EditProductPage() {
             </div>
           </div>
 
-          <span className="text-xs px-3 py-1 rounded-full bg-pink-100 text-pink-600 font-bold">
+          <span className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600 font-bold">
             ID: {id.slice(0, 6)}
           </span>
         </div>
@@ -164,7 +167,7 @@ export default function EditProductPage() {
           <div className="space-y-6">
 
             {/* BASIC INFO */}
-            <div className="bg-white p-6 rounded-2xl shadow border border-pink-100">
+            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
               <h2 className="font-bold text-lg mb-4">Basic Information</h2>
 
               <div className="grid gap-4">
@@ -220,7 +223,7 @@ export default function EditProductPage() {
             </div>
 
             {/* COLORS */}
-            <div className="bg-white p-6 rounded-2xl shadow border border-pink-100">
+            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
               <h2 className="font-bold text-lg mb-4">Colors</h2>
 
               <div className="flex gap-2">
@@ -245,7 +248,7 @@ export default function EditProductPage() {
                   <span
                     key={color}
                     onClick={() => removeColor(color)}
-                    className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full cursor-pointer text-sm"
+                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full cursor-pointer text-sm"
                   >
                     {color} ✕
                   </span>
@@ -259,7 +262,7 @@ export default function EditProductPage() {
           <div className="space-y-6">
 
             {/* STOCK */}
-            <div className="bg-white p-6 rounded-2xl shadow border border-pink-100">
+            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
               <h2 className="font-bold text-lg mb-4">Size Stock</h2>
 
               <div className="grid grid-cols-3 gap-3">
@@ -281,7 +284,7 @@ export default function EditProductPage() {
             </div>
 
             {/* FEATURED */}
-            <div className="bg-white p-6 rounded-2xl shadow border border-pink-100 flex items-center gap-3">
+            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 flex items-center gap-3">
               <input
                 type="checkbox"
                 checked={product.featured}
@@ -299,7 +302,7 @@ export default function EditProductPage() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-pink-600 text-white py-4 rounded-2xl font-bold hover:bg-pink-700 transition flex items-center justify-center gap-2"
+              className="w-full bg-gray-600 text-white py-4 rounded-2xl font-bold hover:bg-gray-700 transition flex items-center justify-center gap-2"
             >
               {saving ? (
                 <>

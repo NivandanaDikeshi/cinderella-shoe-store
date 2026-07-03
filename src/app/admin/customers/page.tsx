@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import customerService from "@/services/customerService";
-
 import CustomerTable from "@/components/customers/CustomerTable";
 
 export default function CustomersPage() {

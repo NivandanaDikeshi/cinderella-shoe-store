@@ -91,8 +91,8 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-pink-50 to-white">
-        <div className="text-pink-600 font-semibold text-lg animate-pulse">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 px-6 py-6 space-y-10">
+        <div className="text-gray-700 font-semibold text-lg animate-pulse">
           Loading Dashboard...
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-pink-50/40 to-white px-6 py-6 space-y-10">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-zinc-50 to-zinc-100 px-6 py-6 space-y-10">
 
       {/* HEADER */}
       <AdminHeader
@@ -114,8 +114,8 @@ export default function AdminDashboardPage() {
         <DashboardCard
           title="Revenue"
           value={`LKR ${totalRevenue.toLocaleString()}`}
-          icon={<DollarSign className="text-pink-500" />}
-          valueClassName="text-pink-600 font-bold"
+          icon={<DollarSign className="text-gray-500" />}
+          valueClassName="text-gray-600 font-bold"
         />
 
         <DashboardCard
@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* LOW STOCK SECTION */}
-      <div className="rounded-3xl bg-white/80 backdrop-blur border border-pink-100 shadow-lg p-6">
+      <div className="rounded-3xl bg-white/80 backdrop-blur border border-gray-100 shadow-lg p-6">
 
         <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
           <AlertTriangle className="text-red-500" />
@@ -169,7 +169,7 @@ export default function AdminDashboardPage() {
             {lowStockProducts.map((product: any) => (
               <div
                 key={product.id}
-                className="flex items-center justify-between px-4 py-3 rounded-xl border border-pink-100 hover:bg-pink-50 transition"
+                className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-100 transition"
               >
                 <div>
                   <p className="font-semibold text-gray-800">
@@ -190,10 +190,10 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* RECENT ORDERS */}
-      <div className="rounded-3xl bg-white/80 backdrop-blur border border-pink-100 shadow-lg p-6">
+      <div className="rounded-3xl bg-white/80 backdrop-blur border border-gray-100 shadow-lg p-6">
 
         <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <ShoppingCart className="text-pink-500" />
+          <ShoppingCart className="text-gray-500" />
           Recent Orders
         </h2>
 
@@ -205,7 +205,7 @@ export default function AdminDashboardPage() {
             <table className="w-full min-w-[700px]">
 
               <thead>
-                <tr className="text-left bg-pink-50 text-gray-600 text-sm">
+                <tr className="text-left bg-gray-100 text-gray-600 text-sm">
                   <th className="py-3 px-3">Order</th>
                   <th className="py-3 px-3">Customer</th>
                   <th className="py-3 px-3">Total</th>
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
                 {orders.slice(0, 10).map((order: any) => (
                   <tr
                     key={order.id}
-                    className="border-b border-pink-50 hover:bg-pink-50/50 transition"
+                    className="border-b border-gray-200 hover:bg-gray-100/50 transition"
                   >
                     <td className="py-4 px-3 font-semibold">
                       {order.orderNumber || order.id}
@@ -229,7 +229,7 @@ export default function AdminDashboardPage() {
                         "Customer"}
                     </td>
 
-                    <td className="py-4 px-3 font-bold text-pink-600">
+                    <td className="py-4 px-3 font-bold text-green-600">
                       LKR {Number(order.total || 0).toLocaleString()}
                     </td>
 

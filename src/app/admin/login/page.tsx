@@ -68,19 +68,19 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 bg-gradient-to-br from-pink-100 via-pink-50 to-white">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 bg-gradient-to-br from-gray-100 via-gray-50 to-white">
 
-      {/* soft pink glow */}
-      <div className="absolute w-[500px] h-[500px] bg-pink-300/40 blur-[140px] top-[-150px] left-[-150px]" />
-      <div className="absolute w-[500px] h-[500px] bg-rose-300/30 blur-[140px] bottom-[-150px] right-[-150px]" />
+      {/* soft gray glow */}
+      <div className="absolute w-[500px] h-[500px] bg-gray-300/40 blur-[140px] top-[-150px] left-[-150px]" />
+      <div className="absolute w-[500px] h-[500px] bg-gray-300/30 blur-[140px] bottom-[-150px] right-[-150px]" />
 
       {/* Card */}
       <div className="w-full max-w-md z-10">
-        <div className="rounded-3xl border border-pink-200 bg-white/80 backdrop-blur-xl shadow-2xl p-8">
+        <div className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur-xl shadow-2xl p-8">
 
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-400 flex items-center justify-center mb-4 shadow-md">
+            <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-500 to-rose-400 flex items-center justify-center mb-4 shadow-md">
               <Shield className="text-white" size={22} />
             </div>
 
@@ -88,7 +88,7 @@ export default function AdminLoginPage() {
               Cinderella Admin
             </h1>
 
-            <p className="text-xs text-pink-500 mt-2 tracking-[0.35em] uppercase">
+            <p className="text-xs text-gray-500 mt-2 tracking-[0.35em] uppercase">
               Secure Login Portal
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@cinderella.com"
-                className="mt-2 w-full px-4 py-3 rounded-xl border border-pink-200 bg-white text-gray-900 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition"
               />
             </div>
 
@@ -120,13 +120,13 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-pink-200 bg-white text-gray-900 outline-none pr-12 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 outline-none pr-12 focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-pink-500 hover:text-pink-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -137,7 +137,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 transition shadow-lg disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-gray-500 to-rose-400 hover:from-gray-600 hover:to-rose-500 transition shadow-lg disabled:opacity-60"
             >
               <Lock size={18} />
               {loading ? "Signing in..." : "Access Admin Panel"}

@@ -94,7 +94,7 @@ export default function SettingsPage() {
         <button
           onClick={save}
           disabled={saving}
-          className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition"
+          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition"
         >
           {saving
             ? "Saving..."

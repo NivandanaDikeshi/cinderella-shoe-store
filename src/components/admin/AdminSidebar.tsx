@@ -9,7 +9,6 @@ import {
   Users,
   ShoppingBag,
   Package,
-  Contact,
   LogOut,
   MessageSquare,
 } from "lucide-react";
@@ -25,8 +24,8 @@ export default function AdminSidebar() {
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Products", href: "/admin/products", icon: ShoppingBag },
     { label: "Orders", href: "/admin/orders", icon: Package },
-    { label: "Contacts", href: "/admin/contacts", icon: Contact },
-    { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
+    { label: "Contacts", href: "/admin/contacts", icon: MessageSquare },
+    { label: "Reviews", href: "/admin/reviews", icon: ShieldCheck },
     { label: "Roles", href: "/admin/roles", icon: ShieldCheck },
     { label: "Manage Staff", href: "/admin/manage-staff", icon: Users },
   ];
@@ -51,15 +50,14 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-[280px] min-h-screen flex flex-col
-      bg-white border-r border-pink-100 text-gray-800">
+    <aside className="w-[280px] min-h-screen flex flex-col bg-white border-r border-gray-200 text-gray-800">
 
       {/* LOGO */}
-      <div className="px-6 py-7 border-b border-pink-100 bg-pink-50">
-        <h1 className="text-2xl font-bold text-pink-600">
+      <div className="px-6 py-7 border-b border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900">
           Cinderella
         </h1>
-        <p className="text-xs text-pink-400 tracking-[0.3em] uppercase mt-1">
+        <p className="text-xs text-gray-500 tracking-[0.3em] uppercase mt-1">
           Admin Panel
         </p>
       </div>
@@ -77,13 +75,12 @@ export default function AdminSidebar() {
               className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition
               ${
                 isActive
-                  ? "bg-pink-50 text-pink-600"
-                  : "text-gray-600 hover:bg-pink-50 hover:text-pink-600"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              {/* ACTIVE BAR */}
               {isActive && (
-                <span className="absolute left-0 top-2 bottom-2 w-[3px] bg-pink-500 rounded-full" />
+                <span className="absolute left-0 top-2 bottom-2 w-[3px] bg-black rounded-full" />
               )}
 
               <Icon size={18} />
@@ -96,21 +93,20 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      {/* USER */}
-      <div className="p-5 border-t border-pink-100 bg-pink-50">
+      {/* USER SECTION */}
+      <div className="p-5 border-t border-gray-200 bg-gray-50">
+
         <p className="text-sm text-gray-700 truncate">
           {user?.email || "admin@cinderella.com"}
         </p>
 
-        <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full
-          bg-pink-100 text-pink-600 border border-pink-200">
+        <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-gray-200 text-gray-700">
           {getRoleLabel(roleCode)}
         </span>
 
         <button
           onClick={handleLogout}
-          className="w-full mt-4 flex items-center justify-center gap-2 py-2.5
-            rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
+          className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black text-white font-medium hover:bg-gray-800 transition"
         >
           <LogOut size={16} />
           Logout

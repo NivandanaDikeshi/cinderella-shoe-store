@@ -22,7 +22,7 @@ export default function CartSummary({
 
       <a
         href="/checkout"
-        className="block text-center bg-pink-600 text-white py-3 rounded-lg"
+        className="block text-center bg-gray-600 text-white py-3 rounded-lg"
       >
         Proceed To Checkout
       </a>

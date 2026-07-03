@@ -6,8 +6,6 @@ import { onSnapshot, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Pencil, Trash2, Package } from "lucide-react";
 
-const PINK = "#EC4899";
-
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,46 +45,47 @@ export default function AdminProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-500 font-semibold">
+      <div className="min-h-screen flex items-center justify-center text-gray-600 font-semibold">
         Loading products...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-pink-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100">
 
       {/* HEADER */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-pink-100 px-6 py-5">
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
+
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-              <Package className="text-pink-500" />
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Package className="text-gray-700" />
               Products Management
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               Manage your store inventory in real-time
             </p>
           </div>
 
           <Link
             href="/admin/products/create"
-            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-black text-pink-500 hover:bg-pink-500 hover:text-white transition"
+            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-black text-white hover:bg-gray-800 transition"
           >
             + Add Product
           </Link>
+
         </div>
       </div>
 
       {/* CONTENT */}
       <div className="p-6">
 
-        {/* TABLE WRAPPER */}
-        <div className="bg-white rounded-2xl shadow border border-pink-100 overflow-x-auto">
+        <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-x-auto">
 
           <table className="w-full min-w-[900px] text-left">
 
-            <thead className="bg-pink-50 text-xs uppercase text-slate-500">
+            <thead className="bg-gray-100 text-xs uppercase text-gray-600">
               <tr>
                 <th className="p-5">Image</th>
                 <th className="p-5">Product</th>
@@ -98,23 +97,23 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-pink-100">
+            <tbody className="divide-y divide-gray-100">
 
               {products.map((product) => {
                 const totalStock = getTotalStock(product.stock);
 
                 return (
-                  <tr key={product.id} className="hover:bg-pink-50 transition">
+                  <tr key={product.id} className="hover:bg-gray-50 transition">
 
                     {/* IMAGE */}
                     <td className="p-5">
                       {product.images?.[0] ? (
                         <img
                           src={product.images[0]}
-                          className="w-12 h-12 rounded-lg object-cover border border-pink-100"
+                          className="w-12 h-12 rounded-lg object-cover border border-gray-200"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-pink-50 flex items-center justify-center text-xs rounded-lg">
+                        <div className="w-12 h-12 bg-gray-100 flex items-center justify-center text-xs rounded-lg text-gray-500">
                           No Image
                         </div>
                       )}
@@ -122,59 +121,59 @@ export default function AdminProductsPage() {
 
                     {/* PRODUCT */}
                     <td className="p-5">
-                      <p className="font-bold text-slate-900">
+                      <p className="font-bold text-gray-900">
                         {product.name}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-gray-500">
                         SKU: {product.sku || "-"}
                       </p>
                     </td>
 
-                    {/* PRICE */}
-                    <td className="p-5 font-bold text-slate-900">
+                    {/* PRICE (GREEN) */}
+                    <td className="p-5 font-bold text-green-600">
                       LKR {product.price}
                     </td>
 
                     {/* STOCK */}
-                    <td className="p-5 text-xs text-slate-600">
+                    <td className="p-5 text-xs text-gray-600">
                       {product.stock ? (
                         Object.entries(product.stock).map(([size, qty]: any) => (
                           <div key={size}>
-                            <span className="font-semibold text-pink-500">
+                            <span className="font-semibold text-gray-800">
                               Size {size}:
                             </span>{" "}
                             {qty}
                           </div>
                         ))
                       ) : (
-                        <span className="text-slate-400">No stock</span>
+                        <span className="text-gray-400">No stock</span>
                       )}
                     </td>
 
                     {/* TOTAL STOCK */}
-                    <td className="p-5 font-bold">
+                    <td className="p-5 font-bold text-gray-900">
                       {totalStock}
 
                       {totalStock <= 5 && totalStock > 0 && (
-                        <span className="ml-2 text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-full">
+                        <span className="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
                           Low
                         </span>
                       )}
 
                       {totalStock === 0 && (
-                        <span className="ml-2 text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded-full">
+                        <span className="ml-2 text-xs bg-gray-300 text-gray-700 px-2 py-1 rounded-full">
                           Out
                         </span>
                       )}
                     </td>
 
-                    {/* STATUS */}
+                    {/* STATUS (GREEN ACTIVE) */}
                     <td className="p-5">
                       <span
                         className={`px-3 py-1 text-xs rounded-full font-bold ${
                           product.status === "active"
-                            ? "bg-pink-100 text-pink-600"
-                            : "bg-slate-100 text-slate-600"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-500"
                         }`}
                       >
                         {product.status || "inactive"}
@@ -187,14 +186,15 @@ export default function AdminProductsPage() {
 
                         <Link
                           href={`/admin/products/edit/${product.id}`}
-                          className="p-2 rounded-lg border border-pink-200 hover:bg-pink-500 hover:text-white transition"
+                          className="p-2 rounded-lg border border-gray-300 hover:bg-gray-900 hover:text-white transition"
                         >
                           <Pencil size={16} />
                         </Link>
 
+                        {/* DELETE BUTTON (RED) */}
                         <button
                           onClick={() => handleDelete(product.id)}
-                          className="p-2 rounded-lg border border-pink-200 hover:bg-pink-500 hover:text-white transition"
+                          className="p-2 rounded-lg border border-gray-300 text-red-600 hover:bg-red-600 hover:text-white transition"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -206,15 +206,17 @@ export default function AdminProductsPage() {
                 );
               })}
             </tbody>
+
           </table>
         </div>
 
         {/* EMPTY STATE */}
         {products.length === 0 && (
-          <div className="text-center py-20 text-slate-500">
+          <div className="text-center py-20 text-gray-500">
             No products found
           </div>
         )}
+
       </div>
     </div>
   );

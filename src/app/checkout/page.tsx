@@ -8,6 +8,8 @@ import {
   Phone,
   MapPin,
   CreditCard,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
 import useCartStore from "@/store/cartStore";
@@ -20,6 +22,9 @@ export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
   const [form, setForm] = useState({
@@ -35,6 +40,9 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
 
   const handleCheckout = async () => {
+    setError("");
+    setSuccess("");
+
     if (
       !form.customerName ||
       !form.email ||
@@ -42,20 +50,19 @@ export default function CheckoutPage() {
       !form.address ||
       !form.city
     ) {
-      alert("Please fill all fields");
+      setError("Please fill all required fields.");
       return;
     }
 
     if (items.length === 0) {
-      alert("Your cart is empty");
+      setError("Your cart is empty.");
       return;
     }
 
-    // IMPORTANT: require logged in user
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-      alert("Please login before placing an order.");
+      setError("Please login before placing an order.");
       router.push("/login");
       return;
     }
@@ -68,28 +75,27 @@ export default function CheckoutPage() {
       const orderData = {
         orderNumber,
 
-        // customer info
         customerName: form.customerName,
         email: form.email,
         phone: form.phone,
         address: form.address,
         city: form.city,
 
-        // USER OWNERSHIP (VERY IMPORTANT)
         userId: currentUser.uid,
         customerEmail: currentUser.email || form.email,
 
-        // order details
         items,
         subtotal,
         shipping,
         total,
+
         status: "Pending",
         paymentMethod,
         paymentStatus:
           paymentMethod === "PAYHERE"
             ? "Pending"
             : "Cash On Delivery",
+
         createdAt: new Date(),
       };
 
@@ -99,10 +105,16 @@ export default function CheckoutPage() {
 
       clearCart();
 
-      router.push(`/orders/${orderId}`);
-    } catch (error: any) {
-      console.error(error);
-      alert(error.message || "Failed to place order");
+      setSuccess("Order placed successfully!");
+
+      // redirect after short delay so user sees message
+      setTimeout(() => {
+        router.push(`/orders/${orderId}`);
+      }, 1200);
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || "Failed to place order. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -111,11 +123,29 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
+
         <h1 className="text-4xl font-bold mb-10 text-center">
           Checkout
         </h1>
 
+        {/* SUCCESS MESSAGE */}
+        {success && (
+          <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-green-50 text-green-700 font-medium">
+            <CheckCircle className="text-green-600" />
+            {success}
+          </div>
+        )}
+
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 text-red-600 font-medium">
+            <XCircle className="text-red-600" />
+            {error}
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
+
           {/* LEFT */}
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-lg p-8">
             <h2 className="text-2xl font-semibold mb-8">
@@ -123,6 +153,7 @@ export default function CheckoutPage() {
             </h2>
 
             <div className="grid md:grid-cols-2 gap-5">
+
               <div className="relative">
                 <User className="absolute left-4 top-4 text-gray-400" />
                 <input
@@ -130,10 +161,7 @@ export default function CheckoutPage() {
                   placeholder="Full Name"
                   value={form.customerName}
                   onChange={(e) =>
-                    setForm({
-                      ...form,
-                      customerName: e.target.value,
-                    })
+                    setForm({ ...form, customerName: e.target.value })
                   }
                   className="w-full border rounded-xl pl-12 pr-4 py-3"
                 />
@@ -146,10 +174,7 @@ export default function CheckoutPage() {
                   placeholder="Email Address"
                   value={form.email}
                   onChange={(e) =>
-                    setForm({
-                      ...form,
-                      email: e.target.value,
-                    })
+                    setForm({ ...form, email: e.target.value })
                   }
                   className="w-full border rounded-xl pl-12 pr-4 py-3"
                 />
@@ -162,10 +187,7 @@ export default function CheckoutPage() {
                   placeholder="Phone Number"
                   value={form.phone}
                   onChange={(e) =>
-                    setForm({
-                      ...form,
-                      phone: e.target.value,
-                    })
+                    setForm({ ...form, phone: e.target.value })
                   }
                   className="w-full border rounded-xl pl-12 pr-4 py-3"
                 />
@@ -178,10 +200,7 @@ export default function CheckoutPage() {
                   placeholder="City"
                   value={form.city}
                   onChange={(e) =>
-                    setForm({
-                      ...form,
-                      city: e.target.value,
-                    })
+                    setForm({ ...form, city: e.target.value })
                   }
                   className="w-full border rounded-xl pl-12 pr-4 py-3"
                 />
@@ -192,26 +211,25 @@ export default function CheckoutPage() {
               placeholder="Delivery Address"
               value={form.address}
               onChange={(e) =>
-                setForm({
-                  ...form,
-                  address: e.target.value,
-                })
+                setForm({ ...form, address: e.target.value })
               }
               rows={4}
               className="w-full border rounded-xl p-4 mt-5"
             />
 
+            {/* PAYMENT */}
             <div className="mt-8">
-              <h3 className="font-semibold mb-4">Payment Method</h3>
+              <h3 className="font-semibold mb-4">
+                Payment Method
+              </h3>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <label
-                  className={`border rounded-xl p-4 cursor-pointer ${
-                    paymentMethod === "COD"
-                      ? "border-pink-600 bg-pink-50"
-                      : ""
-                  }`}
-                >
+
+                <label className={`border rounded-xl p-4 cursor-pointer ${
+                  paymentMethod === "COD"
+                    ? "border-pink-600 bg-pink-50"
+                    : ""
+                }`}>
                   <input
                     type="radio"
                     value="COD"
@@ -222,7 +240,9 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-3">
                     <CreditCard />
                     <div>
-                      <h4 className="font-medium">Cash On Delivery</h4>
+                      <h4 className="font-medium">
+                        Cash On Delivery
+                      </h4>
                       <p className="text-sm text-gray-500">
                         Pay when order arrives
                       </p>
@@ -230,13 +250,11 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                <label
-                  className={`border rounded-xl p-4 cursor-pointer ${
-                    paymentMethod === "PAYHERE"
-                      ? "border-pink-600 bg-pink-50"
-                      : ""
-                  }`}
-                >
+                <label className={`border rounded-xl p-4 cursor-pointer ${
+                  paymentMethod === "PAYHERE"
+                    ? "border-pink-600 bg-pink-50"
+                    : ""
+                }`}>
                   <input
                     type="radio"
                     value="PAYHERE"
@@ -247,19 +265,23 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-3">
                     <CreditCard />
                     <div>
-                      <h4 className="font-medium">Pay Online</h4>
+                      <h4 className="font-medium">
+                        Pay Online
+                      </h4>
                       <p className="text-sm text-gray-500">
                         Secure PayHere Payment
                       </p>
                     </div>
                   </div>
                 </label>
+
               </div>
             </div>
           </div>
 
           {/* RIGHT */}
           <div className="bg-white rounded-3xl shadow-lg p-8 h-fit">
+
             <h2 className="text-2xl font-semibold mb-6">
               Order Summary
             </h2>
@@ -312,7 +334,7 @@ export default function CheckoutPage() {
             <button
               onClick={handleCheckout}
               disabled={loading}
-              className="w-full mt-8 bg-pink-600 hover:bg-pink-700 text-white py-4 rounded-xl font-semibold transition"
+              className="w-full mt-8 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white py-4 rounded-xl font-semibold transition"
             >
               {loading
                 ? "Processing..."
@@ -320,6 +342,7 @@ export default function CheckoutPage() {
                 ? "Pay Now"
                 : "Place Order"}
             </button>
+
           </div>
         </div>
       </div>

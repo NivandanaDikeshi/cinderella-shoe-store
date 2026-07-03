@@ -10,6 +10,7 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import { Star, Trash2, User } from "lucide-react";
 
 interface Review {
   id: string;
@@ -24,7 +25,6 @@ export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // LOAD REVIEWS
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -43,7 +43,7 @@ export default function AdminReviewsPage() {
 
       setReviews(data);
     } catch (error) {
-      console.error("Error loading reviews:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -53,67 +53,96 @@ export default function AdminReviewsPage() {
     fetchReviews();
   }, []);
 
-  // DELETE REVIEW
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
+    if (!confirm("Delete this review?")) return;
 
     try {
       await deleteDoc(doc(db, "reviews", id));
       setReviews((prev) => prev.filter((r) => r.id !== id));
     } catch (error) {
-      console.error("Delete error:", error);
+      console.error(error);
     }
   };
 
-  // STARS UI
   const renderStars = (rating: number) => {
     return (
-      <div className="flex text-yellow-400 text-sm">
-        {"★".repeat(rating)}
-        {"☆".repeat(5 - rating)}
+      <div className="flex items-center gap-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            size={16}
+            className={
+              i < rating
+                ? "text-yellow-400 fill-yellow-400"
+                : "text-gray-300"
+            }
+          />
+        ))}
       </div>
     );
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
+
       {/* HEADER */}
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
           Customer Reviews
         </h1>
         <p className="text-gray-500 mt-1">
-          Manage all product feedback from users
+          Manage and moderate product feedback
         </p>
       </div>
 
       {/* LOADING */}
       {loading ? (
-        <div className="text-gray-500">Loading reviews...</div>
+        <div className="text-gray-500 animate-pulse">
+          Loading reviews...
+        </div>
       ) : reviews.length === 0 ? (
-        <div className="text-gray-500">No reviews found</div>
+        <div className="bg-white border rounded-2xl p-10 text-center text-gray-500">
+          No reviews found
+        </div>
       ) : (
-        <div className="grid gap-5">
+        <div className="grid gap-6">
+
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition"
             >
-              {/* TOP SECTION */}
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {review.userName || "Anonymous"}
-                  </h2>
 
-                  {/* USER ID BADGE */}
-                  <span className="inline-block mt-1 text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600">
-                    User ID: {review.userId}
+              {/* TOP */}
+              <div className="flex justify-between items-start">
+
+                <div className="flex items-start gap-3">
+
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <User size={18} className="text-gray-600" />
+                  </div>
+
+                  <div>
+                    <h2 className="font-semibold text-gray-900">
+                      {review.userName || "Anonymous"}
+                    </h2>
+
+                    <p className="text-xs text-gray-400">
+                      User ID: {review.userId}
+                    </p>
+                  </div>
+
+                </div>
+
+                {/* RATING BADGE */}
+                <div className="flex flex-col items-end gap-1">
+                  {renderStars(review.rating)}
+
+                  <span className="text-xs px-2 py-1 rounded-full bg-yellow-50 text-yellow-600 font-medium">
+                    {review.rating}/5
                   </span>
                 </div>
 
-                {/* STARS */}
-                {renderStars(review.rating)}
               </div>
 
               {/* COMMENT */}
@@ -123,15 +152,20 @@ export default function AdminReviewsPage() {
 
               {/* ACTIONS */}
               <div className="mt-5 flex justify-end">
+
                 <button
                   onClick={() => handleDelete(review.id)}
-                  className="px-4 py-2 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition text-sm"
                 >
-                  Delete Review
+                  <Trash2 size={14} />
+                  Delete
                 </button>
+
               </div>
+
             </div>
           ))}
+
         </div>
       )}
     </div>

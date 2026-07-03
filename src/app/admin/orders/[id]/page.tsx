@@ -147,7 +147,7 @@ export default function AdminOrderDetailsPage() {
           <div className="grid md:grid-cols-4 gap-5">
             <div className="rounded-2xl border bg-gray-50 p-5">
               <div className="flex items-center gap-3 mb-3">
-                <ClipboardList className="text-pink-600" size={20} />
+                <ClipboardList className="text-gray-600" size={20} />
                 <h3 className="font-semibold text-gray-900">Status</h3>
               </div>
 
@@ -162,17 +162,17 @@ export default function AdminOrderDetailsPage() {
 
             <div className="rounded-2xl border bg-gray-50 p-5">
               <div className="flex items-center gap-3 mb-3">
-                <CircleDollarSign className="text-pink-600" size={20} />
+                <CircleDollarSign className="text-gray-600" size={20} />
                 <h3 className="font-semibold text-gray-900">Total</h3>
               </div>
-              <p className="text-2xl font-bold text-pink-600">
+              <p className="text-2xl font-bold text-gray-600">
                 LKR {total.toLocaleString()}
               </p>
             </div>
 
             <div className="rounded-2xl border bg-gray-50 p-5">
               <div className="flex items-center gap-3 mb-3">
-                <CreditCard className="text-pink-600" size={20} />
+                <CreditCard className="text-gray-600" size={20} />
                 <h3 className="font-semibold text-gray-900">Payment</h3>
               </div>
               <p className="font-medium text-gray-900">
@@ -185,7 +185,7 @@ export default function AdminOrderDetailsPage() {
 
             <div className="rounded-2xl border bg-gray-50 p-5">
               <div className="flex items-center gap-3 mb-3">
-                <CalendarDays className="text-pink-600" size={20} />
+                <CalendarDays className="text-gray-600" size={20} />
                 <h3 className="font-semibold text-gray-900">Created</h3>
               </div>
               <p className="font-medium text-gray-900">
@@ -201,7 +201,7 @@ export default function AdminOrderDetailsPage() {
             {/* ORDER ITEMS */}
             <div className="bg-white rounded-3xl shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-6">
-                <Package className="text-pink-600" size={22} />
+                <Package className="text-gray-600" size={22} />
                 <h2 className="text-xl font-bold text-gray-900">
                   Ordered Items
                 </h2>
@@ -259,7 +259,7 @@ export default function AdminOrderDetailsPage() {
                           <p className="text-sm text-gray-500 mb-1">
                             Item Total
                           </p>
-                          <p className="text-lg font-bold text-pink-600">
+                          <p className="text-lg font-bold text-gray-600">
                             LKR{" "}
                             {(
                               Number(item.price || 0) *
@@ -320,7 +320,7 @@ export default function AdminOrderDetailsPage() {
 
               <div className="space-y-4 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
-                  <User className="text-pink-600 mt-0.5" size={18} />
+                  <User className="text-gray-600 mt-0.5" size={18} />
                   <div>
                     <p className="text-gray-500">Customer Name</p>
                     <p className="font-medium">
@@ -330,7 +330,7 @@ export default function AdminOrderDetailsPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Mail className="text-pink-600 mt-0.5" size={18} />
+                  <Mail className="text-gray-600 mt-0.5" size={18} />
                   <div>
                     <p className="text-gray-500">Email</p>
                     <p className="font-medium break-all">
@@ -340,7 +340,7 @@ export default function AdminOrderDetailsPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Phone className="text-pink-600 mt-0.5" size={18} />
+                  <Phone className="text-gray-600 mt-0.5" size={18} />
                   <div>
                     <p className="text-gray-500">Phone</p>
                     <p className="font-medium">{order.phone || "N/A"}</p>
@@ -348,7 +348,7 @@ export default function AdminOrderDetailsPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <MapPin className="text-pink-600 mt-0.5" size={18} />
+                  <MapPin className="text-gray-600 mt-0.5" size={18} />
                   <div>
                     <p className="text-gray-500">Delivery Address</p>
                     <p className="font-medium">
@@ -383,7 +383,7 @@ export default function AdminOrderDetailsPage() {
 
                 <div className="border-t pt-4 flex justify-between text-base font-bold">
                   <span>Total</span>
-                  <span className="text-pink-600">
+                  <span className="text-gray-600">
                     LKR {total.toLocaleString()}
                   </span>
                 </div>

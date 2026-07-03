@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Heart, Minus, ShoppingCart } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
 
 import productService from "@/services/productService";
 import ProductSearch from "@/components/storefront/ProductSearch";
@@ -17,278 +18,204 @@ export default function ShopPage() {
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("");
 
-  const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
-  const [selectedColors, setSelectedColors] = useState<Record<string, string>>({});
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
+  // CATEGORY FROM URL
   useEffect(() => {
-    loadProducts();
+    const urlCategory = searchParams.get("category");
+    if (urlCategory) setCategory(urlCategory.toLowerCase());
+  }, [searchParams]);
+
+  // LOAD PRODUCTS
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await productService.getProducts();
+        setProducts(data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    load();
   }, []);
 
-  const loadProducts = async () => {
-    try {
-      const data = await productService.getProducts();
-      setProducts(data || []);
-    } catch (error) {
-      console.error("Error loading products:", error);
-    }
-  };
-
   const getImage = (product: any) => {
-    if (Array.isArray(product?.images) && product.images.length > 0) {
-      return product.images[0];
-    }
-
-    if (typeof product?.images === "string") {
-      return product.images;
-    }
-
-    if (product?.image) {
-      return product.image;
-    }
-
+    if (Array.isArray(product?.images)) return product.images[0];
+    if (typeof product?.images === "string") return product.images;
+    if (product?.image) return product.image;
     return "/placeholder.jpg";
   };
 
   const handleAddToCart = (product: any) => {
-    const size = selectedSizes[product.id];
-    const color = selectedColors[product.id] || "";
-    const quantity = quantities[product.id] || 1;
-
-    if (!size) {
-      alert("Please select a size first");
-      return;
-    }
-
     addToCart({
       id: product.id,
       name: product.name,
       price: Number(product.price),
       image: getImage(product),
-      size,
-      color,
-      quantity,
+      size: product.sizes?.[0] || "",
+      color: product.colors?.[0] || "",
+      sizes: product.sizes || [],
+      colors: product.colors || [],
+      quantity: 1,
     });
+
+    router.push("/cart");
   };
 
-  const updateQty = (productId: string, value: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: Math.max(1, value),
-    }));
-  };
+  // FILTER
+  const filtered = products.filter((p) => {
+    const matchSearch = p.name?.toLowerCase().includes(search.toLowerCase());
+    const matchCategory =
+      !category || p.category?.toLowerCase() === category.toLowerCase();
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name?.toLowerCase().includes(search.toLowerCase());
-
-    const matchesCategory = !category || product.category === category;
-
-    return matchesSearch && matchesCategory;
+    return matchSearch && matchCategory;
   });
 
-  const sortedProducts = [...filteredProducts];
-
-  if (sort === "low") {
-    sortedProducts.sort((a, b) => Number(a.price) - Number(b.price));
-  }
-
-  if (sort === "high") {
-    sortedProducts.sort((a, b) => Number(b.price) - Number(a.price));
-  }
+  // SORT
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === "low") return Number(a.price) - Number(b.price);
+    if (sort === "high") return Number(b.price) - Number(a.price);
+    return 0;
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
+
       {/* HEADER */}
-      <div className="mx-auto max-w-7xl px-4 pt-8 pb-6 sm:px-6 sm:pt-10 lg:px-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-          Shop Shoes 👠
+      <div className="mx-auto max-w-7xl px-4 pt-14 pb-8">
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
+          Discover Premium Shoes 👠
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-gray-500 sm:text-base">
-          Discover premium shoes designed for comfort, elegance, and everyday
-          style.
+
+        <p className="mt-2 text-gray-500 text-lg">
+          Elegant designs crafted for comfort, confidence & modern lifestyle.
         </p>
+
+        {category && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-pink-100 px-4 py-1 text-sm font-semibold text-pink-600">
+            Showing: {category.toUpperCase()}
+          </div>
+        )}
       </div>
 
-      {/* FILTERS */}
-      <div className="mx-auto mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="w-full">
+      {/* FILTER BAR */}
+      <div className="mx-auto max-w-7xl px-4 mb-10">
+        <div className="grid gap-4 md:grid-cols-3">
+
+          <div className="rounded-2xl bg-white shadow-sm p-2">
             <ProductSearch search={search} setSearch={setSearch} />
           </div>
 
-          <div className="w-full">
+          <div className="rounded-2xl bg-white shadow-sm p-2">
             <ProductFilters category={category} setCategory={setCategory} />
           </div>
 
-          <div className="w-full">
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-pink-400"
-            >
-              <option value="">Sort Products</option>
-              <option value="low">Price: Low → High</option>
-              <option value="high">Price: High → Low</option>
-            </select>
-          </div>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="rounded-2xl bg-white px-4 py-3 text-sm shadow-sm border border-gray-100 focus:border-pink-400 outline-none"
+          >
+            <option value="">Sort Products</option>
+            <option value="low">Price: Low → High</option>
+            <option value="high">Price: High → Low</option>
+          </select>
+
         </div>
       </div>
 
       {/* PRODUCTS */}
-      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {sortedProducts.length > 0 ? (
-            sortedProducts.map((product) => {
-              const sizes = Array.isArray(product.sizes) ? product.sizes : [];
-              const colors = Array.isArray(product.colors) ? product.colors : [];
+      <div className="mx-auto max-w-7xl px-4 pb-20">
+
+        {sorted.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">
+              No products found in this category.
+            </p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+            {sorted.map((product) => {
               const imageUrl = getImage(product);
 
               return (
                 <div
                   key={product.id}
-                  className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                  className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
+
                   {/* IMAGE */}
-                  <div className="relative">
+                  <div className="relative overflow-hidden">
                     <img
                       src={imageUrl}
-                      alt={product.name}
-                      className="h-60 w-full object-cover sm:h-64"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.jpg";
-                      }}
+                      className="h-72 w-full object-cover group-hover:scale-110 transition duration-700"
                     />
 
-                    {/* Wishlist */}
                     <button
                       onClick={() => toggleWishlist(product)}
-                      className={`absolute right-3 top-3 rounded-full bg-white p-2 shadow-sm transition ${
-                        isInWishlist(product.id)
-                          ? "text-red-500"
-                          : "text-gray-600 hover:text-pink-600"
-                      }`}
-                      aria-label="Toggle wishlist"
+                      className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-md hover:scale-110 transition"
                     >
                       <Heart
                         size={18}
-                        fill={isInWishlist(product.id) ? "currentColor" : "none"}
+                        fill={
+                          isInWishlist(product.id) ? "#ef4444" : "none"
+                        }
                       />
                     </button>
+
+                    {/* soft overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                   </div>
 
                   {/* CONTENT */}
-                  <div className="p-4 sm:p-5">
-                    <h3 className="line-clamp-1 text-lg font-bold text-gray-900">
+                  <div className="p-5">
+
+                    <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
                       {product.name}
                     </h3>
 
-                    <div className="mt-2">
+                    <div className="mt-1">
                       <ProductRating productId={product.id} />
                     </div>
-
-                    <p className="mt-1 text-sm text-gray-500">
-                      {product.category}
-                    </p>
 
                     <p className="mt-2 text-xl font-bold text-pink-600">
                       LKR {Number(product.price).toLocaleString()}
                     </p>
 
-                    {/* SIZE */}
-                    <select
-                      className="mt-3 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-pink-400"
-                      value={selectedSizes[product.id] || ""}
-                      onChange={(e) =>
-                        setSelectedSizes({
-                          ...selectedSizes,
-                          [product.id]: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Select Size</option>
-                      {sizes.length > 0 ? (
-                        sizes.map((s: string) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>No sizes</option>
-                      )}
-                    </select>
+                    {/* ACTIONS */}
+                    <div className="mt-4 flex gap-2">
 
-                    {/* COLOR */}
-                    <select
-                      className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-pink-400"
-                      value={selectedColors[product.id] || ""}
-                      onChange={(e) =>
-                        setSelectedColors({
-                          ...selectedColors,
-                          [product.id]: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Select Color</option>
-                      {colors.length > 0 ? (
-                        colors.map((c: string) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>No colors</option>
-                      )}
-                    </select>
-
-                    {/* QTY */}
-                    <div className="mt-3 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2.5">
                       <button
-                        onClick={() =>
-                          updateQty(product.id, (quantities[product.id] || 1) - 1)
-                        }
-                        className="rounded-md p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
-                        aria-label="Decrease quantity"
+                        onClick={() => handleAddToCart(product)}
+                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-rose-500 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition"
                       >
-                        <Minus size={16} />
+                        <ShoppingCart size={16} />
+                        Add to Cart
                       </button>
-
-                      <span className="text-sm font-semibold text-gray-800">
-                        {quantities[product.id] || 1}
-                      </span>
 
                       <button
                         onClick={() =>
-                          updateQty(product.id, (quantities[product.id] || 1) + 1)
+                          router.push(`/product/${product.id}`)
                         }
-                        className="rounded-md p-1 text-gray-700 transition hover:bg-pink-50 hover:text-pink-600"
-                        aria-label="Increase quantity"
+                        className="w-11 h-11 flex items-center justify-center rounded-xl border border-pink-200 bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
                       >
-                        <Plus size={16} />
+                        <Eye size={18} />
                       </button>
+
                     </div>
 
-                    {/* ADD TO CART */}
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-700"
-                    >
-                      <ShoppingCart size={17} />
-                      Add to Cart
-                    </button>
                   </div>
                 </div>
               );
-            })
-          ) : (
-            <div className="col-span-full rounded-2xl bg-white/70 py-20 text-center text-gray-500 shadow-sm">
-              No products found
-            </div>
-          )}
-        </div>
+            })}
+
+          </div>
+        )}
+
       </div>
     </div>
   );

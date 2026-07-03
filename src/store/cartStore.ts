@@ -8,16 +8,32 @@ export interface CartItem {
   name: string;
   price: number;
   image: string;
+
   size: string;
   color: string;
+
+  sizes: string[];
+  colors: string[];
+
   quantity: number;
 }
 
 interface CartStore {
   items: CartItem[];
+
   addToCart: (item: CartItem) => void;
+
   removeFromCart: (id: string, size: string, color: string) => void;
+
+  updateCartItem: (
+    id: string,
+    size: string,
+    color: string,
+    updates: Partial<CartItem>
+  ) => void;
+
   clearCart: () => void;
+
   getTotal: () => number;
 }
 
@@ -41,7 +57,7 @@ const useCartStore = create<CartStore>()(
                 i.id === item.id &&
                 i.size === item.size &&
                 i.color === item.color
-                  ? { ...i, quantity: i.quantity + 1 }
+                  ? { ...i, quantity: i.quantity + item.quantity }
                   : i
               ),
             };
@@ -53,12 +69,18 @@ const useCartStore = create<CartStore>()(
       removeFromCart: (id, size, color) =>
         set((state) => ({
           items: state.items.filter(
-            (i) =>
-              !(
-                i.id === id &&
-                i.size === size &&
-                i.color === color
-              )
+            (i) => !(i.id === id && i.size === size && i.color === color)
+          ),
+        })),
+
+      updateCartItem: (id, size, color, updates) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id &&
+            item.size === size &&
+            item.color === color
+              ? { ...item, ...updates }
+              : item
           ),
         })),
 
@@ -66,7 +88,7 @@ const useCartStore = create<CartStore>()(
 
       getTotal: () =>
         get().items.reduce(
-          (t, i) => t + i.price * i.quantity,
+          (total, item) => total + item.price * item.quantity,
           0
         ),
     }),

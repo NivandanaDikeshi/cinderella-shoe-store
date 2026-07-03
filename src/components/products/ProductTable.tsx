@@ -69,11 +69,11 @@ export default function ProductTable({ products, onDelete }: Props) {
   };
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-pink-100 bg-white shadow-[0_16px_50px_rgba(15,23,42,0.06)]">
+    <div className="overflow-hidden rounded-[28px] border border-gray-100 bg-white shadow-[0_16px_50px_rgba(15,23,42,0.06)]">
       {/* Desktop Table */}
       <div className="hidden overflow-x-auto lg:block">
         <table className="min-w-full">
-          <thead className="bg-gradient-to-r from-pink-50 via-white to-pink-50">
+          <thead className="bg-gradient-to-r from-gray-50 via-white to-gray-50">
             <tr className="border-b border-slate-200">
               <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                 Product
@@ -105,7 +105,7 @@ export default function ProductTable({ products, onDelete }: Props) {
                 return (
                   <tr
                     key={product.id}
-                    className="border-b border-slate-100 transition hover:bg-pink-50/40"
+                    className="border-b border-slate-100 transition hover:bg-gray-100/40"
                   >
                     {/* Product */}
                     <td className="px-6 py-5">
@@ -141,7 +141,7 @@ export default function ProductTable({ products, onDelete }: Props) {
 
                     {/* Price */}
                     <td className="px-6 py-5">
-                      <span className="text-sm font-bold text-pink-600">
+                      <span className="text-sm font-bold text-gray-600">
                         LKR {Number(product.price || 0).toLocaleString()}
                       </span>
                     </td>
@@ -211,7 +211,7 @@ export default function ProductTable({ products, onDelete }: Props) {
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
                   <div className="mx-auto flex max-w-md flex-col items-center">
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-pink-50 text-pink-500">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-gray-500">
                       <Package2 size={28} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900">
@@ -287,7 +287,7 @@ export default function ProductTable({ products, onDelete }: Props) {
                         <p className="text-xs uppercase tracking-wider text-slate-400">
                           Price
                         </p>
-                        <p className="mt-1 font-bold text-pink-600">
+                        <p className="mt-1 font-bold text-gray-600">
                           LKR {Number(product.price || 0).toLocaleString()}
                         </p>
                       </div>
@@ -349,7 +349,7 @@ export default function ProductTable({ products, onDelete }: Props) {
           })
         ) : (
           <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-pink-50 text-pink-500">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-gray-500">
               <Package2 size={28} />
             </div>
             <h3 className="text-lg font-bold text-slate-900">

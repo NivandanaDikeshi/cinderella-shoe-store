@@ -1,54 +1,42 @@
-import ProductReviews from "@/components/reviews/ProductReviews";
+import productService from "@/services/productService";
+import ProductClient from "./product-client";
 
-async function getProductById(id: string) {
-  const response = await fetch(`/api/products/${id}`);
-  if (!response.ok) return null;
-  return response.json();
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+// 🔥 Convert Firestore data → safe JSON
+function sanitize(doc: any) {
+  return JSON.parse(
+    JSON.stringify(doc, (key, value) => {
+      if (value?.seconds) {
+        return new Date(value.seconds * 1000).toISOString();
+      }
+      return value;
+    })
+  );
 }
 
-export default async function Page({
-  params,
-}: {
-  params: { id: string };
-}) {
-  
-  const product = await getProductById(params.id);
+export default async function Page({ params }: Props) {
+  const { id } = await params;
 
-  // ❌ Not found UI
-  if (!product) {
+  const rawProduct: any = await productService.getProductById(id);
+
+  if (!rawProduct) {
     return (
       <div className="text-center py-20">
         <h1 className="text-red-500 text-2xl font-bold">
           Product not found
         </h1>
-        <p className="text-gray-500 mt-2">
-          Please check the URL or go back to shop.
-        </p>
       </div>
     );
   }
 
+  const product = sanitize(rawProduct);
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* PRODUCT INFO */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {product.name}
-        </h1>
-
-        <p className="text-gray-600 mt-2">
-          {product.description}
-        </p>
-
-        <p className="text-xl font-semibold mt-4 text-pink-600">
-          Rs. {product.price}
-        </p>
-      </div>
-
-      {/* REVIEWS SECTION */}
-      <div className="mt-10">
-        <ProductReviews productId={params.id} />
-      </div>
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+      <ProductClient product={product} />
     </div>
   );
 }
