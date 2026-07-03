@@ -50,16 +50,18 @@ export default function ShopPage() {
     return "/placeholder.jpg";
   };
 
+  // ✅ FIXED CART FUNCTION
   const handleAddToCart = (product: any) => {
     addToCart({
       id: product.id,
       name: product.name,
       price: Number(product.price),
       image: getImage(product),
+
+      // safe fallback
       size: product.sizes?.[0] || "",
       color: product.colors?.[0] || "",
-      sizes: product.sizes || [],
-      colors: product.colors || [],
+
       quantity: 1,
     });
 
@@ -167,7 +169,6 @@ export default function ShopPage() {
                       />
                     </button>
 
-                    {/* soft overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                   </div>
 
