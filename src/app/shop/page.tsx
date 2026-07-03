@@ -1,9 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
 
 import productService from "@/services/productService";
@@ -21,43 +19,59 @@ export default function ShopPage() {
   const [sort, setSort] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
-  // CATEGORY FROM URL
+  // CATEGORY FROM URL (SAFE)
   useEffect(() => {
-    const urlCategory = searchParams.get("category");
-    if (urlCategory) setCategory(urlCategory.toLowerCase());
-  }, [searchParams]);
+    if (typeof window === "undefined") return;
+
+    const urlCategory = new URLSearchParams(window.location.search).get("category");
+
+    if (urlCategory) {
+      setCategory(urlCategory.toLowerCase());
+    }
+  }, []);
 
   // LOAD PRODUCTS
   useEffect(() => {
     const load = async () => {
       try {
         const data = await productService.getProducts();
-        setProducts(data || []);
+        setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load products:", err);
+        setProducts([]);
       }
     };
+
     load();
   }, []);
 
+  // IMAGE HANDLER
   const getImage = (product: any) => {
-    if (Array.isArray(product?.images)) return product.images[0];
-    if (typeof product?.images === "string") return product.images;
-    if (product?.image) return product.image;
-    return "/placeholder.jpg";
+    if (!product) return "/placeholder.jpg";
+
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images[0];
+    }
+
+    if (typeof product.images === "string") {
+      return product.images;
+    }
+
+    return product.image || "/placeholder.jpg";
   };
 
-  // CART
+  // ADD TO CART (SAFE)
   const handleAddToCart = (product: any) => {
+    if (!product) return;
+
     addToCart({
       id: product.id,
-      name: product.name,
-      price: Number(product.price),
+      name: product.name || "Unknown Product",
+      price: Number(product.price) || 0,
       image: getImage(product),
 
       size: product.sizes?.[0] || "",
@@ -69,19 +83,24 @@ export default function ShopPage() {
     router.push("/cart");
   };
 
-  // FILTER
+  // FILTER (SAFE)
   const filtered = products.filter((p) => {
-    const matchSearch = p.name?.toLowerCase().includes(search.toLowerCase());
+    const name = p?.name?.toLowerCase() || "";
+    const matchSearch = name.includes(search.toLowerCase());
+
     const matchCategory =
-      !category || p.category?.toLowerCase() === category.toLowerCase();
+      !category || (p?.category || "").toLowerCase() === category.toLowerCase();
 
     return matchSearch && matchCategory;
   });
 
   // SORT
   const sorted = [...filtered].sort((a, b) => {
-    if (sort === "low") return Number(a.price) - Number(b.price);
-    if (sort === "high") return Number(b.price) - Number(a.price);
+    const priceA = Number(a?.price) || 0;
+    const priceB = Number(b?.price) || 0;
+
+    if (sort === "low") return priceA - priceB;
+    if (sort === "high") return priceB - priceA;
     return 0;
   });
 
@@ -90,7 +109,7 @@ export default function ShopPage() {
 
       {/* HEADER */}
       <div className="mx-auto max-w-7xl px-4 pt-14 pb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
+        <h1 className="text-4xl font-extrabold text-gray-900">
           Discover Premium Shoes 👠
         </h1>
 
@@ -120,7 +139,7 @@ export default function ShopPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="rounded-2xl bg-white px-4 py-3 text-sm shadow-sm border border-gray-100 focus:border-pink-400 outline-none"
+            className="rounded-2xl bg-white px-4 py-3 text-sm border border-gray-100 focus:border-pink-400 outline-none"
           >
             <option value="">Sort Products</option>
             <option value="low">Price: Low → High</option>
@@ -147,7 +166,7 @@ export default function ShopPage() {
 
               return (
                 <div
-                  key={product.id}
+                  key={product?.id}
                   className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
 
@@ -164,9 +183,7 @@ export default function ShopPage() {
                     >
                       <Heart
                         size={18}
-                        fill={
-                          isInWishlist(product.id) ? "#ef4444" : "none"
-                        }
+                        fill={isInWishlist(product?.id) ? "#ef4444" : "none"}
                       />
                     </button>
 
@@ -177,15 +194,15 @@ export default function ShopPage() {
                   <div className="p-5">
 
                     <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-                      {product.name}
+                      {product?.name}
                     </h3>
 
                     <div className="mt-1">
-                      <ProductRating productId={product.id} />
+                      <ProductRating productId={product?.id} />
                     </div>
 
                     <p className="mt-2 text-xl font-bold text-pink-600">
-                      LKR {Number(product.price).toLocaleString()}
+                      LKR {Number(product?.price || 0).toLocaleString()}
                     </p>
 
                     {/* ACTIONS */}
@@ -200,9 +217,7 @@ export default function ShopPage() {
                       </button>
 
                       <button
-                        onClick={() =>
-                          router.push(`/product/${product.id}`)
-                        }
+                        onClick={() => router.push(`/product/${product?.id}`)}
                         className="w-11 h-11 flex items-center justify-center rounded-xl border border-pink-200 bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
                       >
                         <Eye size={18} />
