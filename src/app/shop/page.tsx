@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart, ShoppingBag, Eye, Search, SlidersHorizontal, X } from "lucide-react";
 
@@ -21,7 +21,7 @@ type Product = {
 
 const CATEGORIES = ["Heels", "Flats", "Sandals", "Slippers"];
 
-export default function ShopPage() {
+function ShopPageInner() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -46,7 +46,6 @@ export default function ShopPage() {
       setLoading(true);
       const data = await productService.getProducts();
       if (!cancelled) {
-        // ensure typed as Product[] to satisfy state setter
         setProducts((data as Product[]) || []);
         setLoading(false);
       }
@@ -333,5 +332,13 @@ function EmptyState({ onReset }: { onReset: () => void }) {
         Clear filters
       </button>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<SkeletonGrid />}>
+      <ShopPageInner />
+    </Suspense>
   );
 }
