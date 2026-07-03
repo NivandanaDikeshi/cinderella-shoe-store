@@ -6,6 +6,8 @@ import useCartStore from "@/store/cartStore";
 
 export default function ProductClient({ product }: any) {
   const router = useRouter();
+
+  // ✅ IMPORTANT: must match your store
   const { addToCart } = useCartStore();
 
   const sizes = product.sizes || [];
@@ -30,6 +32,7 @@ export default function ProductClient({ product }: any) {
 
   const [toast, setToast] = useState("");
 
+  // ✅ ADD TO CART FIXED
   const handleAddToCart = () => {
     if (!selectedSize) {
       setToast("Please select a size");
@@ -51,7 +54,7 @@ export default function ProductClient({ product }: any) {
       color: selectedColor,
       quantity: 1,
 
-      // ✅ REQUIRED FOR YOUR STORE
+      // ✅ REQUIRED for CartItem type
       sizes,
       colors,
     });
