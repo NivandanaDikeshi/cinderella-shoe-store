@@ -59,12 +59,11 @@ export default function WishlistPage() {
                 {/* IMAGE */}
                 <div className="relative overflow-hidden">
                   <img
-                    src={product.images?.[0] || "/placeholder.jpg"}
+                    src={product.image || "/placeholder.jpg"}
                     alt={product.name}
                     className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
 
-                  {/* soft overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                 </div>
 
@@ -75,7 +74,6 @@ export default function WishlistPage() {
                     {product.name}
                   </h3>
 
-                  {/* PRICE BADGE */}
                   <div className="inline-flex rounded-full bg-pink-50 px-3 py-1 text-sm font-semibold text-pink-600">
                     LKR {Number(product.price).toLocaleString()}
                   </div>
@@ -83,7 +81,7 @@ export default function WishlistPage() {
                   {/* ACTIONS */}
                   <div className="flex items-center gap-2 pt-2">
 
-                    {/* VIEW ICON (PINK STYLE) */}
+                    {/* VIEW */}
                     <button
                       onClick={() => router.push(`/product/${product.id}`)}
                       className="flex-1 flex items-center justify-center rounded-xl border border-pink-200 bg-pink-50 py-2.5 text-pink-600 transition hover:bg-pink-100 hover:border-pink-400 hover:scale-105"
@@ -92,7 +90,7 @@ export default function WishlistPage() {
                       <Eye size={18} />
                     </button>
 
-                    {/* REMOVE ICON */}
+                    {/* REMOVE */}
                     <button
                       onClick={() => removeFromWishlist(product.id)}
                       className="flex items-center justify-center rounded-xl bg-red-50 px-4 py-2.5 text-red-500 transition hover:bg-red-100 hover:scale-105"

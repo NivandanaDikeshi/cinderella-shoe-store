@@ -35,9 +35,14 @@ export default function ProductClient({ product }: any) {
       name: product.name,
       price: product.price,
       image: selectedImage,
+
       size: selectedSize,
       color: selectedColor,
       quantity: 1,
+
+      // ✅ IMPORTANT FIX
+      sizes,
+      colors,
     });
 
     setToast("Added to cart ✅");
@@ -51,13 +56,12 @@ export default function ProductClient({ product }: any) {
   return (
     <div className="grid md:grid-cols-2 gap-10">
 
-      {/* ================= IMAGE ================= */}
+      {/* IMAGE */}
       <div className="space-y-4">
-
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
           <img
             src={selectedImage}
-            className="w-full h-[450px] object-cover transition duration-300 hover:scale-110"
+            className="w-full h-[450px] object-cover"
           />
         </div>
 
@@ -68,50 +72,31 @@ export default function ProductClient({ product }: any) {
               src={img}
               onClick={() => setSelectedImage(img)}
               className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${
-                selectedImage === img
-                  ? "border-black"
-                  : "border-transparent"
+                selectedImage === img ? "border-black" : "border-transparent"
               }`}
             />
           ))}
         </div>
       </div>
 
-      {/* ================= DETAILS ================= */}
+      {/* DETAILS */}
       <div className="space-y-6">
 
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {product.name}
-          </h1>
+        <h1 className="text-3xl font-bold">{product.name}</h1>
 
-          <div className="mt-3 bg-gray-50 p-4 rounded-xl border">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">
-              Product Description
-            </h3>
-
-            <p className="text-gray-600 leading-relaxed text-sm">
-              {product.description ||
-                "No description available for this product."}
-            </p>
-          </div>
-        </div>
-
-        {/* PRICE */}
         <p className="text-2xl font-bold text-pink-600">
           LKR {product.price}
         </p>
 
-        {/* ================= SIZE ================= */}
+        {/* SIZE */}
         <div>
           <h2 className="font-semibold mb-2">Select Size</h2>
-
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 flex-wrap">
             {availableSizes.map((size: string) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 border rounded-lg text-sm transition ${
+                className={`px-4 py-2 border rounded-lg ${
                   selectedSize === size
                     ? "bg-black text-white"
                     : "hover:border-black"
@@ -123,22 +108,20 @@ export default function ProductClient({ product }: any) {
           </div>
         </div>
 
-        {/* ================= COLOR ================= */}
+        {/* COLOR */}
         <div>
           <h2 className="font-semibold mb-2">Select Color</h2>
-
           <div className="flex gap-3">
             {colors.map((color: string) => (
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`w-10 h-10 rounded-full border-2 transition ${
+                className={`w-10 h-10 rounded-full border-2 ${
                   selectedColor === color
-                    ? "scale-110 border-black"
+                    ? "border-black scale-110"
                     : "border-gray-300"
                 }`}
                 style={{ backgroundColor: color.toLowerCase() }}
-                title={color}
               />
             ))}
           </div>
@@ -155,7 +138,7 @@ export default function ProductClient({ product }: any) {
         {/* ADD TO CART */}
         <button
           onClick={handleAddToCart}
-          className="w-full bg-black text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition"
+          className="w-full bg-black text-white py-3 rounded-xl"
         >
           Add to Cart
         </button>
@@ -163,7 +146,7 @@ export default function ProductClient({ product }: any) {
 
       {/* TOAST */}
       {toast && (
-        <div className="fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded-xl shadow-lg">
+        <div className="fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded-xl">
           {toast}
         </div>
       )}

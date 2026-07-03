@@ -1,52 +1,53 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-import { db } from "@/lib/firebase/config";
+interface WishlistItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+}
 
-export const addToWishlist = async (
-  userId: string,
-  product: any
-) => {
-  await addDoc(
-    collection(db, "wishlists"),
+interface WishlistStore {
+  items: WishlistItem[];
+  toggleWishlist: (item: WishlistItem) => void;
+  isInWishlist: (id: string) => boolean;
+  removeFromWishlist: (id: string) => void;
+}
+
+const useWishlistStore = create<WishlistStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+
+      toggleWishlist: (item) => {
+        const exists = get().items.find((i) => i.id === item.id);
+
+        if (exists) {
+          set({
+            items: get().items.filter((i) => i.id !== item.id),
+          });
+        } else {
+          set({
+            items: [...get().items, item],
+          });
+        }
+      },
+
+      isInWishlist: (id) => {
+        return get().items.some((i) => i.id === id);
+      },
+
+      removeFromWishlist: (id) => {
+        set({
+          items: get().items.filter((i) => i.id !== id),
+        });
+      },
+    }),
     {
-      userId,
-      productId: product.id,
-      productName: product.name,
-      price: product.price,
-      image: product.images?.[0] || "",
-      createdAt: new Date(),
+      name: "wishlist-storage",
     }
-  );
-};
+  )
+);
 
-export const getWishlist = async (
-  userId: string
-) => {
-  const q = query(
-    collection(db, "wishlists"),
-    where("userId", "==", userId)
-  );
-
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-};
-
-export const removeWishlist = async (
-  id: string
-) => {
-  await deleteDoc(
-    doc(db, "wishlists", id)
-  );
-};
+export default useWishlistStore;

@@ -5,12 +5,10 @@ import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import useCartStore from "@/store/cartStore";
 
 export default function CartPage() {
-  const { items, getTotal, removeFromCart, updateCartItem } =
-    useCartStore() as any;
+  const { items, getTotal, removeFromCart, updateCartItem } = useCartStore();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 px-4 py-10 sm:px-6 lg:px-8">
-
       <div className="mx-auto max-w-7xl">
 
         {/* HEADER */}
@@ -26,7 +24,6 @@ export default function CartPage() {
         {/* EMPTY STATE */}
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white/70 backdrop-blur-md px-6 py-24 text-center shadow-xl">
-
             <div className="text-6xl mb-4">🛒</div>
 
             <h2 className="text-2xl font-bold text-gray-800">
@@ -44,7 +41,6 @@ export default function CartPage() {
               <ShoppingBag size={18} />
               Start Shopping
             </Link>
-
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -62,6 +58,7 @@ export default function CartPage() {
                   <img
                     src={item.image}
                     className="h-28 w-28 rounded-2xl object-cover"
+                    alt={item.name}
                   />
 
                   {/* DETAILS */}
@@ -75,24 +72,29 @@ export default function CartPage() {
                       LKR {item.price}
                     </div>
 
-                    {/* SIZE */}
+                    {/* AVAILABLE SIZES */}
                     {item.sizes?.length > 0 && (
                       <div>
-                        <p className="text-xs text-gray-500 mt-2">Sizes</p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Available Sizes
+                        </p>
 
                         <div className="flex flex-wrap gap-2 mt-1">
                           {item.sizes.map((s: string) => (
                             <button
                               key={s}
                               onClick={() =>
-                                updateCartItem(item.id, item.size, item.color, {
-                                  size: s,
-                                })
+                                updateCartItem(
+                                  item.id,
+                                  item.size,
+                                  item.color,
+                                  { size: s }
+                                )
                               }
                               className={`px-3 py-1 rounded-xl text-xs border transition ${
                                 item.size === s
                                   ? "bg-pink-600 text-white border-pink-600"
-                                  : "hover:border-pink-400"
+                                  : "bg-white hover:border-pink-400"
                               }`}
                             >
                               {s}
@@ -102,26 +104,34 @@ export default function CartPage() {
                       </div>
                     )}
 
-                    {/* COLOR */}
+                    {/* AVAILABLE COLORS */}
                     {item.colors?.length > 0 && (
                       <div>
-                        <p className="text-xs text-gray-500 mt-2">Colors</p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Available Colors
+                        </p>
 
                         <div className="flex gap-2 mt-1">
                           {item.colors.map((c: string) => (
                             <button
                               key={c}
+                              title={c}
                               onClick={() =>
-                                updateCartItem(item.id, item.size, item.color, {
-                                  color: c,
-                                })
+                                updateCartItem(
+                                  item.id,
+                                  item.size,
+                                  item.color,
+                                  { color: c }
+                                )
                               }
-                              className={`h-6 w-6 rounded-full border-2 transition ${
+                              className={`h-7 w-7 rounded-full border-2 transition ${
                                 item.color === c
                                   ? "border-black scale-110"
                                   : "border-gray-300"
                               }`}
-                              style={{ backgroundColor: c.toLowerCase() }}
+                              style={{
+                                backgroundColor: c.toLowerCase(),
+                              }}
                             />
                           ))}
                         </div>
@@ -131,13 +141,20 @@ export default function CartPage() {
                     {/* QUANTITY */}
                     <div className="flex items-center gap-3 pt-2">
 
-                      {/* MINUS (cannot go below 1) */}
                       <button
                         disabled={item.quantity <= 1}
                         onClick={() =>
-                          updateCartItem(item.id, item.size, item.color, {
-                            quantity: Math.max(1, item.quantity - 1),
-                          })
+                          updateCartItem(
+                            item.id,
+                            item.size,
+                            item.color,
+                            {
+                              quantity: Math.max(
+                                1,
+                                item.quantity - 1
+                              ),
+                            }
+                          )
                         }
                         className={`rounded-xl border p-2 transition ${
                           item.quantity <= 1
@@ -152,31 +169,37 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
 
-                      {/* PLUS */}
                       <button
                         onClick={() =>
-                          updateCartItem(item.id, item.size, item.color, {
-                            quantity: item.quantity + 1,
-                          })
+                          updateCartItem(
+                            item.id,
+                            item.size,
+                            item.color,
+                            {
+                              quantity: item.quantity + 1,
+                            }
+                          )
                         }
                         className="rounded-xl border p-2 hover:bg-pink-50 transition"
                       >
                         <Plus size={16} />
                       </button>
-
                     </div>
                   </div>
 
                   {/* REMOVE */}
                   <button
                     onClick={() =>
-                      removeFromCart(item.id, item.size, item.color)
+                      removeFromCart(
+                        item.id,
+                        item.size,
+                        item.color
+                      )
                     }
                     className="rounded-xl bg-red-50 px-3 py-2 text-red-500 transition hover:bg-red-100 hover:scale-105"
                   >
                     <Trash2 size={16} />
                   </button>
-
                 </div>
               ))}
             </div>

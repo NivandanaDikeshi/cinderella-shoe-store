@@ -1,5 +1,3 @@
-"use client";
-
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -9,9 +7,13 @@ export interface CartItem {
   price: number;
   image: string;
 
-  // Selected options
+  // selected variant
   size: string;
   color: string;
+
+  // available variants
+  sizes: string[];
+  colors: string[];
 
   quantity: number;
 }
@@ -21,11 +23,7 @@ interface CartStore {
 
   addToCart: (item: CartItem) => void;
 
-  removeFromCart: (
-    id: string,
-    size: string,
-    color: string
-  ) => void;
+  removeFromCart: (id: string, size: string, color: string) => void;
 
   updateCartItem: (
     id: string,
@@ -33,8 +31,6 @@ interface CartStore {
     color: string,
     updates: Partial<CartItem>
   ) => void;
-
-  clearCart: () => void;
 
   getTotal: () => number;
 }
@@ -44,25 +40,23 @@ const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
 
+      // ADD ITEM (avoid duplicates)
       addToCart: (item) =>
         set((state) => {
-          const existingItem = state.items.find(
+          const existing = state.items.find(
             (i) =>
               i.id === item.id &&
               i.size === item.size &&
               i.color === item.color
           );
 
-          if (existingItem) {
+          if (existing) {
             return {
               items: state.items.map((i) =>
                 i.id === item.id &&
                 i.size === item.size &&
                 i.color === item.color
-                  ? {
-                      ...i,
-                      quantity: i.quantity + item.quantity,
-                    }
+                  ? { ...i, quantity: i.quantity + item.quantity }
                   : i
               ),
             };
@@ -73,18 +67,16 @@ const useCartStore = create<CartStore>()(
           };
         }),
 
+      // REMOVE ITEM
       removeFromCart: (id, size, color) =>
         set((state) => ({
           items: state.items.filter(
-            (item) =>
-              !(
-                item.id === id &&
-                item.size === size &&
-                item.color === color
-              )
+            (i) =>
+              !(i.id === id && i.size === size && i.color === color)
           ),
         })),
 
+      // UPDATE ITEM (SAFE)
       updateCartItem: (id, size, color, updates) =>
         set((state) => ({
           items: state.items.map((item) =>
@@ -96,11 +88,7 @@ const useCartStore = create<CartStore>()(
           ),
         })),
 
-      clearCart: () =>
-        set({
-          items: [],
-        }),
-
+      // TOTAL
       getTotal: () =>
         get().items.reduce(
           (total, item) => total + item.price * item.quantity,
