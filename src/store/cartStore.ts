@@ -10,6 +10,7 @@ export interface CartItem {
   size: string;
   color: string;
 
+  // available options
   sizes: string[];
   colors: string[];
 
@@ -20,6 +21,7 @@ interface CartStore {
   items: CartItem[];
 
   addToCart: (item: CartItem) => void;
+
   removeFromCart: (id: string, size: string, color: string) => void;
 
   updateCartItem: (
@@ -31,7 +33,6 @@ interface CartStore {
 
   getTotal: () => number;
 
-  // ✅ ADD THIS
   clearCart: () => void;
 }
 
@@ -40,6 +41,7 @@ const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
 
+      // ADD TO CART
       addToCart: (item) =>
         set((state) => {
           const existing = state.items.find(
@@ -61,17 +63,20 @@ const useCartStore = create<CartStore>()(
             };
           }
 
-          return { items: [...state.items, item] };
+          return {
+            items: [...state.items, item],
+          };
         }),
 
+      // REMOVE ITEM
       removeFromCart: (id, size, color) =>
         set((state) => ({
           items: state.items.filter(
-            (i) =>
-              !(i.id === id && i.size === size && i.color === color)
+            (i) => !(i.id === id && i.size === size && i.color === color)
           ),
         })),
 
+      // UPDATE ITEM
       updateCartItem: (id, size, color, updates) =>
         set((state) => ({
           items: state.items.map((item) =>
@@ -83,13 +88,14 @@ const useCartStore = create<CartStore>()(
           ),
         })),
 
+      // TOTAL
       getTotal: () =>
         get().items.reduce(
           (total, item) => total + item.price * item.quantity,
           0
         ),
 
-      // ✅ CLEAR CART FUNCTION
+      // CLEAR CART
       clearCart: () => set({ items: [] }),
     }),
     {

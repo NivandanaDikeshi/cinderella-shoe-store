@@ -17,30 +17,41 @@ export default function ProductClient({ product }: any) {
       ? product.images
       : [product.image || "/placeholder.jpg"];
 
-  const [selectedSize, setSelectedSize] = useState(sizes[0] || "");
+  const availableSizes = sizes.filter(
+    (s: string) => (stock?.[s] ?? 0) > 0
+  );
+
+  const [selectedSize, setSelectedSize] = useState(
+    availableSizes[0] || sizes[0] || ""
+  );
+
   const [selectedColor, setSelectedColor] = useState(colors[0] || "");
   const [selectedImage, setSelectedImage] = useState(images[0]);
 
   const [toast, setToast] = useState("");
 
-  const availableSizes = sizes.filter(
-    (s: string) => (stock?.[s] ?? 0) > 0
-  );
-
   const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) return;
+    if (!selectedSize) {
+      setToast("Please select a size");
+      return;
+    }
+
+    if (!selectedColor) {
+      setToast("Please select a color");
+      return;
+    }
 
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       image: selectedImage,
 
       size: selectedSize,
       color: selectedColor,
       quantity: 1,
 
-      // ✅ IMPORTANT FIX
+      // ✅ REQUIRED FOR YOUR STORE
       sizes,
       colors,
     });
@@ -71,8 +82,10 @@ export default function ProductClient({ product }: any) {
               key={img}
               src={img}
               onClick={() => setSelectedImage(img)}
-              className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${
-                selectedImage === img ? "border-black" : "border-transparent"
+              className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${
+                selectedImage === img
+                  ? "border-black"
+                  : "border-transparent"
               }`}
             />
           ))}
@@ -91,39 +104,54 @@ export default function ProductClient({ product }: any) {
         {/* SIZE */}
         <div>
           <h2 className="font-semibold mb-2">Select Size</h2>
+
           <div className="flex gap-2 flex-wrap">
-            {availableSizes.map((size: string) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 border rounded-lg ${
-                  selectedSize === size
-                    ? "bg-black text-white"
-                    : "hover:border-black"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+            {availableSizes.length > 0 ? (
+              availableSizes.map((size: string) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`px-4 py-2 border rounded-lg transition ${
+                    selectedSize === size
+                      ? "bg-black text-white"
+                      : "hover:border-black"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))
+            ) : (
+              <p className="text-sm text-red-500">
+                No sizes available
+              </p>
+            )}
           </div>
         </div>
 
         {/* COLOR */}
         <div>
           <h2 className="font-semibold mb-2">Select Color</h2>
+
           <div className="flex gap-3">
-            {colors.map((color: string) => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                className={`w-10 h-10 rounded-full border-2 ${
-                  selectedColor === color
-                    ? "border-black scale-110"
-                    : "border-gray-300"
-                }`}
-                style={{ backgroundColor: color.toLowerCase() }}
-              />
-            ))}
+            {colors.length > 0 ? (
+              colors.map((color: string) => (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  title={color}
+                  className={`w-10 h-10 rounded-full border-2 transition ${
+                    selectedColor === color
+                      ? "border-black scale-110"
+                      : "border-gray-300"
+                  }`}
+                  style={{ backgroundColor: color.toLowerCase() }}
+                />
+              ))
+            ) : (
+              <p className="text-sm text-red-500">
+                No colors available
+              </p>
+            )}
           </div>
         </div>
 
@@ -138,7 +166,7 @@ export default function ProductClient({ product }: any) {
         {/* ADD TO CART */}
         <button
           onClick={handleAddToCart}
-          className="w-full bg-black text-white py-3 rounded-xl"
+          className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition"
         >
           Add to Cart
         </button>
@@ -146,7 +174,7 @@ export default function ProductClient({ product }: any) {
 
       {/* TOAST */}
       {toast && (
-        <div className="fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded-xl">
+        <div className="fixed bottom-5 right-5 bg-black text-white px-4 py-2 rounded-xl shadow-lg">
           {toast}
         </div>
       )}
