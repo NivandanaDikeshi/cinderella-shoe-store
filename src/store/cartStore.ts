@@ -9,11 +9,9 @@ export interface CartItem {
   price: number;
   image: string;
 
+  // Selected options
   size: string;
   color: string;
-
-  sizes: string[];
-  colors: string[];
 
   quantity: number;
 }
@@ -23,7 +21,11 @@ interface CartStore {
 
   addToCart: (item: CartItem) => void;
 
-  removeFromCart: (id: string, size: string, color: string) => void;
+  removeFromCart: (
+    id: string,
+    size: string,
+    color: string
+  ) => void;
 
   updateCartItem: (
     id: string,
@@ -44,32 +46,42 @@ const useCartStore = create<CartStore>()(
 
       addToCart: (item) =>
         set((state) => {
-          const exists = state.items.find(
+          const existingItem = state.items.find(
             (i) =>
               i.id === item.id &&
               i.size === item.size &&
               i.color === item.color
           );
 
-          if (exists) {
+          if (existingItem) {
             return {
               items: state.items.map((i) =>
                 i.id === item.id &&
                 i.size === item.size &&
                 i.color === item.color
-                  ? { ...i, quantity: i.quantity + item.quantity }
+                  ? {
+                      ...i,
+                      quantity: i.quantity + item.quantity,
+                    }
                   : i
               ),
             };
           }
 
-          return { items: [...state.items, item] };
+          return {
+            items: [...state.items, item],
+          };
         }),
 
       removeFromCart: (id, size, color) =>
         set((state) => ({
           items: state.items.filter(
-            (i) => !(i.id === id && i.size === size && i.color === color)
+            (item) =>
+              !(
+                item.id === id &&
+                item.size === size &&
+                item.color === color
+              )
           ),
         })),
 
@@ -84,7 +96,10 @@ const useCartStore = create<CartStore>()(
           ),
         })),
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () =>
+        set({
+          items: [],
+        }),
 
       getTotal: () =>
         get().items.reduce(
@@ -92,7 +107,9 @@ const useCartStore = create<CartStore>()(
           0
         ),
     }),
-    { name: "cart-storage" }
+    {
+      name: "cart-storage",
+    }
   )
 );
 
