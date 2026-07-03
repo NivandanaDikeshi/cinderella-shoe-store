@@ -38,8 +38,6 @@ export default function ProductClient({ product }: any) {
       size: selectedSize,
       color: selectedColor,
       quantity: 1,
-      sizes,
-      colors,
     });
 
     setToast("Added to cart ✅");
@@ -87,7 +85,6 @@ export default function ProductClient({ product }: any) {
             {product.name}
           </h1>
 
-          {/* ✅ DESCRIPTION (NEW PROFESSIONAL STYLE) */}
           <div className="mt-3 bg-gray-50 p-4 rounded-xl border">
             <h3 className="text-sm font-semibold text-gray-700 mb-1">
               Product Description
