@@ -9,7 +9,17 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
-import { Eye, EyeOff, Shield, Lock } from "lucide-react";
+import { Eye, EyeOff, Shield, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  "auth/invalid-credential": "Incorrect email or password. Please try again.",
+  "auth/invalid-email": "That email address doesn't look right.",
+  "auth/user-disabled": "This account has been disabled. Contact support.",
+  "auth/user-not-found": "No account found with that email.",
+  "auth/wrong-password": "Incorrect email or password. Please try again.",
+  "auth/too-many-requests": "Too many attempts. Please wait a moment and try again.",
+  "auth/network-request-failed": "Network error. Check your connection and try again.",
+};
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -19,9 +29,13 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
@@ -38,7 +52,9 @@ export default function AdminLoginPage() {
 
       if (!userSnap.exists()) {
         await signOut(auth);
-        throw new Error("User not found.");
+        setError("No account found for this login. Please contact support.");
+        setLoading(false);
+        return;
       }
 
       const userData = userSnap.data();
@@ -47,7 +63,9 @@ export default function AdminLoginPage() {
       if (roleCode !== 0 && roleCode !== 1) {
         await signOut(auth);
         clearAdminData();
-        throw new Error("Access denied. Admins only.");
+        setError("Access denied. This account doesn't have admin permissions.");
+        setLoading(false);
+        return;
       }
 
       setAdminData(
@@ -57,19 +75,24 @@ export default function AdminLoginPage() {
         userData.permissions || []
       );
 
-      router.push("/admin/dashboard");
-    } catch (error: any) {
-      console.error(error);
+      setSuccess("Access granted. Redirecting to dashboard...");
+
+      setTimeout(() => {
+        router.push("/admin/dashboard");
+      }, 600);
+    } catch (err: any) {
       clearAdminData();
-      alert(error.message || "Invalid credentials");
-    } finally {
+      const code = err?.code as string | undefined;
+      setError(
+        (code && ERROR_MESSAGES[code]) ||
+          "Invalid credentials. Please try again."
+      );
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 bg-gradient-to-br from-gray-100 via-gray-50 to-white">
-
       {/* soft gray glow */}
       <div className="absolute w-[500px] h-[500px] bg-gray-300/40 blur-[140px] top-[-150px] left-[-150px]" />
       <div className="absolute w-[500px] h-[500px] bg-gray-300/30 blur-[140px] bottom-[-150px] right-[-150px]" />
@@ -77,7 +100,6 @@ export default function AdminLoginPage() {
       {/* Card */}
       <div className="w-full max-w-md z-10">
         <div className="rounded-3xl border border-gray-200 bg-white/80 backdrop-blur-xl shadow-2xl p-8">
-
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-500 to-rose-400 flex items-center justify-center mb-4 shadow-md">
@@ -93,9 +115,24 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
+          {/* ERROR BANNER */}
+          {error && (
+            <div className="mb-5 flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 animate-[fadeIn_0.2s_ease-out]">
+              <AlertCircle size={17} className="shrink-0 mt-0.5" />
+              <p className="leading-snug">{error}</p>
+            </div>
+          )}
+
+          {/* SUCCESS BANNER */}
+          {success && (
+            <div className="mb-5 flex items-start gap-2.5 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 animate-[fadeIn_0.2s_ease-out]">
+              <CheckCircle2 size={17} className="shrink-0 mt-0.5" />
+              <p className="leading-snug">{success}</p>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleAdminLogin} className="space-y-5">
-
             {/* Email */}
             <div>
               <label className="text-xs text-gray-600">Email</label>
@@ -150,6 +187,19 @@ export default function AdminLoginPage() {
           </p>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

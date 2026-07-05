@@ -6,7 +6,15 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
-import { User, Mail, Lock, UserPlus } from "lucide-react";
+import { User, Mail, Lock, UserPlus, AlertCircle, CheckCircle2 } from "lucide-react";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  "auth/email-already-in-use": "This email is already registered. Redirecting to login...",
+  "auth/invalid-email": "Invalid email format.",
+  "auth/weak-password": "Password must be at least 6 characters.",
+  "auth/missing-password": "Please enter a password.",
+  "auth/network-request-failed": "Network error. Check your connection and try again.",
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,27 +24,31 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
     if (!name.trim()) {
-      alert("Please enter your full name.");
+      setError("Please enter your full name.");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
+      setError("Password must be at least 6 characters.");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
     if (!auth) {
-      alert("Firebase auth is not available.");
+      setError("Something went wrong on our end. Please try again shortly.");
       return;
     }
 
@@ -64,36 +76,25 @@ export default function RegisterPage() {
         createdAt: serverTimestamp(),
       });
 
-      alert("Registration successful!");
-      router.push("/login");
-    } catch (error: any) {
-      console.error("Register error:", error);
+      setSuccess("Registration successful! Redirecting to login...");
 
-      const code = error?.code;
+      setTimeout(() => {
+        router.push("/login");
+      }, 900);
+    } catch (err: any) {
+      const code = err?.code as string | undefined;
 
       if (code === "auth/email-already-in-use") {
-        alert("This email is already registered. Please login instead.");
-        router.push("/login");
+        setError(ERROR_MESSAGES[code]);
+        setTimeout(() => router.push("/login"), 1200);
+        setLoading(false);
         return;
       }
 
-      if (code === "auth/invalid-email") {
-        alert("Invalid email format.");
-        return;
-      }
-
-      if (code === "auth/weak-password") {
-        alert("Password must be at least 6 characters.");
-        return;
-      }
-
-      if (code === "auth/missing-password") {
-        alert("Please enter a password.");
-        return;
-      }
-
-      alert("Registration failed. Please try again.");
-    } finally {
+      setError(
+        (code && ERROR_MESSAGES[code]) ||
+          "Registration failed. Please try again."
+      );
       setLoading(false);
     }
   };
@@ -111,6 +112,22 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-white/70 backdrop-blur-xl border border-gray-200 shadow-xl rounded-3xl p-8">
+          {/* ERROR BANNER */}
+          {error && (
+            <div className="mb-5 flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 animate-[fadeIn_0.2s_ease-out]">
+              <AlertCircle size={17} className="shrink-0 mt-0.5" />
+              <p className="leading-snug">{error}</p>
+            </div>
+          )}
+
+          {/* SUCCESS BANNER */}
+          {success && (
+            <div className="mb-5 flex items-start gap-2.5 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 animate-[fadeIn_0.2s_ease-out]">
+              <CheckCircle2 size={17} className="shrink-0 mt-0.5" />
+              <p className="leading-snug">{success}</p>
+            </div>
+          )}
+
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
               <label className="text-sm font-medium text-gray-600">
@@ -198,6 +215,19 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

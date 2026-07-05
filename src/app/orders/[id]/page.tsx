@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase/config";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   Package,
@@ -17,7 +18,6 @@ import {
 
 export default function OrderDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params?.id as string;
 
   const [order, setOrder] = useState<any>(null);
@@ -25,43 +25,66 @@ export default function OrderDetailsPage() {
   const [notAllowed, setNotAllowed] = useState(false);
 
   useEffect(() => {
-    const user = auth.currentUser;
-
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
     if (!id) return;
 
-    const unsub = onSnapshot(
-      doc(db, "orders", id),
-      (snap) => {
-        if (!snap.exists()) {
-          setOrder(null);
-          setLoading(false);
-          return;
-        }
-
-        const data = { id: snap.id, ...snap.data() } as any;
-
-        if (data.userId !== user.uid) {
-          setNotAllowed(true);
-          setLoading(false);
-          return;
-        }
-
-        setOrder(data);
-        setLoading(false);
-      },
-      (error) => {
-        console.error(error);
-        setLoading(false);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "/login";
+        return;
       }
-    );
 
-    return () => unsub();
-  }, [id, router]);
+      const unsub = onSnapshot(
+        doc(db, "orders", id),
+        (snap) => {
+          if (!snap.exists()) {
+            setOrder(null);
+            setLoading(false);
+            return;
+          }
+
+          const data = { id: snap.id, ...snap.data() } as any;
+
+          if (data.userId !== user.uid) {
+            setNotAllowed(true);
+            setLoading(false);
+            return;
+          }
+
+          setOrder(data);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Order fetch error:", error);
+          setLoading(false);
+        }
+      );
+
+      return () => unsub();
+    });
+
+    return () => unsubscribeAuth();
+  }, [id]);
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "N/A";
+
+    try {
+      const date =
+        typeof timestamp?.toDate === "function"
+          ? timestamp.toDate()
+          : new Date(timestamp?.seconds ? timestamp.seconds * 1000 : timestamp);
+
+      return date.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "N/A";
+    }
+  };
 
   if (loading) {
     return (
@@ -110,31 +133,29 @@ export default function OrderDetailsPage() {
 
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {order.orderNumber}
+                {order.orderNumber || `Order #${order.id.slice(-6)}`}
               </h1>
 
               <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <CalendarDays size={16} />
-                  {order.createdAt?.seconds
-                    ? new Date(order.createdAt.seconds * 1000).toLocaleString()
-                    : "N/A"}
+                  {formatDate(order.createdAt)}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <CreditCard size={16} />
-                  {order.paymentMethod}
+                  {order.paymentMethod || "N/A"}
                 </div>
               </div>
             </div>
 
             <div className="text-right">
               <span className="inline-flex px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700">
-                {order.status}
+                {order.status || "Pending"}
               </span>
 
               <p className="mt-3 text-3xl font-bold text-pink-600">
-                LKR {Number(order.total || 0).toLocaleString()}
+                LKR {Number(order.totalAmount || order.total || 0).toLocaleString()}
               </p>
             </div>
 
@@ -162,8 +183,12 @@ export default function OrderDetailsPage() {
 
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-sm text-gray-500">Size: {item.size}</p>
-                    <p className="text-sm text-gray-500">Color: {item.color}</p>
+                    <p className="text-sm text-gray-500">
+                      Size: {item.size || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Color: {item.color || "N/A"}
+                    </p>
                     <p className="text-sm text-gray-500">
                       Qty: {item.quantity}
                     </p>
@@ -186,17 +211,17 @@ export default function OrderDetailsPage() {
 
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex gap-2 items-center">
-                  <User size={16} /> {order.customerName}
+                  <User size={16} /> {order.customerName || "N/A"}
                 </div>
                 <div className="flex gap-2 items-center">
-                  <Mail size={16} /> {order.email}
+                  <Mail size={16} /> {order.email || "N/A"}
                 </div>
                 <div className="flex gap-2 items-center">
-                  <Phone size={16} /> {order.phone}
+                  <Phone size={16} /> {order.phone || "N/A"}
                 </div>
                 <div className="flex gap-2 items-center">
                   <MapPin size={16} />
-                  {order.address}, {order.city}
+                  {order.address || "N/A"}, {order.city || ""}
                 </div>
               </div>
             </div>
@@ -208,18 +233,18 @@ export default function OrderDetailsPage() {
               <div className="space-y-3 text-gray-700">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>LKR {order.subtotal}</span>
+                  <span>LKR {order.subtotal || 0}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>LKR {order.shipping}</span>
+                  <span>LKR {order.shipping || 0}</span>
                 </div>
 
                 <div className="border-t pt-4 flex justify-between font-bold">
                   <span>Total</span>
                   <span className="text-pink-600">
-                    LKR {order.total}
+                    LKR {order.totalAmount || order.total || 0}
                   </span>
                 </div>
               </div>
