@@ -151,7 +151,7 @@ export default function ProfilePage() {
               onClick={handleUpdate}
               disabled={loading}
               className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm sm:text-base font-semibold text-white shadow-md transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${
-                saved ? "bg-[#2FAE6C]" : "bg-[#df2d60] hover:bg-[#ea4b78]"
+                saved ? "bg-[#2FAE6C]" : "bg-[#E60076] hover:bg-[#C6005C]"
               }`}
             >
               {saved ? (

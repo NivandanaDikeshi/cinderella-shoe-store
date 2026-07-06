@@ -10,9 +10,19 @@ import {
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "@/lib/firebase/config";
 import { Package, ShoppingBag, XCircle, ChevronRight } from "lucide-react";
 import CustomerOrdersTable from "@/components/orders/CustomerOrdersTable";
+
+type Order = {
+  id: string;
+  orderNumber?: string;
+  status?: string;
+  total?: number;
+  items?: unknown[];
+  userId?: string;
+};
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   pending: { bg: "bg-[#FDF3D9]", text: "text-[#8A6A1A]", dot: "bg-[#D4A017]" },
@@ -23,7 +33,7 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> =
 };
 
 export default function MyOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [cancellingId, setCancellingId] = useState("");
@@ -31,30 +41,42 @@ export default function MyOrdersPage() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
-    const user = auth.currentUser;
+    // Wait for Firebase to resolve the auth state before querying.
+    // On a page refresh, auth.currentUser is briefly null until the
+    // session is restored, so reading it synchronously here would
+    // incorrectly show "No orders yet" for a logged-in user.
+    let unsubOrders: (() => void) | undefined;
 
-    if (!user) {
-      setOrders([]);
-      setLoading(false);
-      return;
-    }
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      // Clean up any previous orders listener before attaching a new one
+      unsubOrders?.();
 
-    const q = query(
-      collection(db, "orders"),
-      where("userId", "==", user.uid)
-    );
+      if (!user) {
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
 
-    const unsub = onSnapshot(q, (snap) => {
-      setOrders(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }))
+      const q = query(
+        collection(db, "orders"),
+        where("userId", "==", user.uid)
       );
-      setLoading(false);
+
+      unsubOrders = onSnapshot(q, (snap) => {
+        setOrders(
+          snap.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          })) as Order[]
+        );
+        setLoading(false);
+      });
     });
 
-    return () => unsub();
+    return () => {
+      unsubAuth();
+      unsubOrders?.();
+    };
   }, []);
 
   const handleCancelClick = (orderId: string) => {
@@ -68,8 +90,9 @@ export default function MyOrdersPage() {
     try {
       setCancellingId(selectedOrderId);
 
+      // Lowercase to match STATUS_STYLES keys used across the app
       await updateDoc(doc(db, "orders", selectedOrderId), {
-        status: "Cancelled",
+        status: "cancelled",
         cancelledAt: serverTimestamp(),
       });
 
@@ -144,7 +167,7 @@ export default function MyOrdersPage() {
 
             <button
               onClick={() => (window.location.href = "/shop")}
-              className="mt-6 px-6 py-3 rounded-full bg-[#B33B5E] text-white text-sm font-semibold hover:bg-[#9A3251] active:scale-[0.98] transition shadow-sm"
+              className="mt-6 px-6 py-3 rounded-full bg-[#E60076] text-white text-sm font-semibold hover:bg-[#C6005C] active:scale-[0.98] transition shadow-sm"
             >
               Start Shopping
             </button>
@@ -168,6 +191,7 @@ export default function MyOrdersPage() {
               <CustomerOrdersTable
                 orders={orders}
                 onCancelOrder={handleCancelClick}
+                cancellingId={cancellingId}
               />
             </div>
 
@@ -199,7 +223,7 @@ export default function MyOrdersPage() {
                         className={`inline-flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize ${status.bg} ${status.text}`}
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
-                        {order.status || "pending"}
+                        {statusKey}
                       </span>
                     </div>
 
@@ -212,7 +236,8 @@ export default function MyOrdersPage() {
                         {canCancel && (
                           <button
                             onClick={() => handleCancelClick(order.id)}
-                            className="px-3 py-1.5 rounded-full bg-[#FBE4E4] text-[#A23B3B] text-xs font-semibold active:scale-95 transition"
+                            disabled={cancellingId === order.id}
+                            className="px-3 py-1.5 rounded-full bg-[#FBE4E4] text-[#A23B3B] text-xs font-semibold active:scale-95 transition disabled:opacity-50"
                           >
                             Cancel
                           </button>
