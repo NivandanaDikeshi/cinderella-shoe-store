@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import productService from "@/services/productService";
 import { db } from "@/lib/firebase/config";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
 import AccessDenied from "@/components/admin/AccessDenied";
@@ -43,14 +42,16 @@ export default function EditProductPage() {
 
   const loadProduct = async () => {
     try {
-      const data: any = await productService.getProductById(id);
+      const docRef = doc(db, "products", id);
+      const docSnap = await getDoc(docRef);
 
-      if (!data) {
+      if (!docSnap.exists()) {
         alert("Product not found");
         router.push("/admin/products");
         return;
       }
 
+      const data = docSnap.data();
       setProduct({
         ...data,
         stock: data?.stock || {},
