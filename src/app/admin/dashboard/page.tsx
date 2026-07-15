@@ -6,6 +6,8 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import AdminHeader from "@/components/admin/AdminHeader";
 import DashboardCard from "@/components/admin/DashboardCard";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 import {
   ShoppingCart,
   Users,
@@ -17,6 +19,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
+  const { roleCode, hasPermission } = useAdminAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
@@ -97,6 +100,11 @@ export default function AdminDashboardPage() {
         </div>
       </div>
     );
+  }
+
+  const canView = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("view dashboard"));
+  if (!canView) {
+    return <AccessDenied />;
   }
 
   return (

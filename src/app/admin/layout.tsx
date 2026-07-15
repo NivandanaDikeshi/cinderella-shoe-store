@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/config";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -51,9 +51,10 @@ export default function AdminLayout({
         }
 
         const userData = userSnap.data();
-        const roleCode = Number(userData.roleCode);
+        const roleCode = typeof userData.roleCode === "number" ? userData.roleCode : Number(userData.roleCode);
 
-        if (roleCode !== 0 && roleCode !== 1) {
+        // Customers (roleCode 99) are not allowed in the admin area
+        if (roleCode === 99 || isNaN(roleCode)) {
           await signOut(auth).catch(() => {});
           clearAdminData();
           setLoading(false);
@@ -61,7 +62,45 @@ export default function AdminLayout({
           return;
         }
 
-        setAdminData(firebaseUser, "admin", roleCode);
+        // Fetch user permissions from the Roles collection matching their roleName
+        let permissions: string[] = [];
+        try {
+          const rolesSnap = await getDocs(collection(db, "roles"));
+          const matchedRole = rolesSnap.docs.find(
+            (docSnap) => docSnap.data().name === userData.roleName
+          );
+          if (matchedRole) {
+            permissions = matchedRole.data().permissions || [];
+          } else if (roleCode === 0) {
+            // Master Admin fallback if roles collection is empty/missing
+            permissions = [
+              "view dashboard",
+              "manage orders",
+              "manage products",
+              "manage staff",
+              "manage roles",
+              "manage contacts",
+              "manage reviews",
+              "manage settings",
+            ];
+          }
+        } catch (roleErr) {
+          console.error("Error loading staff permissions:", roleErr);
+          if (roleCode === 0) {
+            permissions = [
+              "view dashboard",
+              "manage orders",
+              "manage products",
+              "manage staff",
+              "manage roles",
+              "manage contacts",
+              "manage reviews",
+              "manage settings",
+            ];
+          }
+        }
+
+        setAdminData(firebaseUser, "admin", roleCode, permissions);
         setLoading(false);
       } catch (error) {
         console.error("Admin auth error:", error);

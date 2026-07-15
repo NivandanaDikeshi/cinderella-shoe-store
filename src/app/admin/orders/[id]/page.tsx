@@ -17,8 +17,11 @@ import {
 } from "lucide-react";
 
 import orderService from "@/services/orderService";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 export default function AdminOrderDetailsPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const params = useParams();
   const id = params.id as string;
 
@@ -71,7 +74,7 @@ export default function AdminOrderDetailsPage() {
     return "bg-yellow-100 text-yellow-700 border-yellow-200";
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="p-6">
         <div className="bg-white rounded-3xl shadow-sm border p-10 text-center">
@@ -81,6 +84,11 @@ export default function AdminOrderDetailsPage() {
         </div>
       </div>
     );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage orders"));
+  if (!canManage) {
+    return <AccessDenied />;
   }
 
   if (!order) {

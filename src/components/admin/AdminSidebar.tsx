@@ -18,16 +18,16 @@ import { useAdminAuthStore } from "@/store/adminAuthStore";
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, roleCode, clearAdminData } = useAdminAuthStore();
+  const { user, roleCode, hasPermission, clearAdminData } = useAdminAuthStore();
 
   const navItems = [
-    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Products", href: "/admin/products", icon: ShoppingBag },
-    { label: "Orders", href: "/admin/orders", icon: Package },
-    { label: "Contacts", href: "/admin/contacts", icon: MessageSquare },
-    { label: "Reviews", href: "/admin/reviews", icon: ShieldCheck },
-    { label: "Roles", href: "/admin/roles", icon: ShieldCheck },
-    { label: "Manage Staff", href: "/admin/manage-staff", icon: Users },
+    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permission: "view dashboard" },
+    { label: "Products", href: "/admin/products", icon: ShoppingBag, permission: "manage products" },
+    { label: "Orders", href: "/admin/orders", icon: Package, permission: "manage orders" },
+    { label: "Contacts", href: "/admin/contacts", icon: MessageSquare, permission: "manage contacts" },
+    { label: "Reviews", href: "/admin/reviews", icon: ShieldCheck, permission: "manage reviews" },
+    { label: "Roles", href: "/admin/roles", icon: ShieldCheck, permission: "manage roles" },
+    { label: "Manage Staff", href: "/admin/manage-staff", icon: Users, permission: "manage staff" },
   ];
 
   const getRoleLabel = (code: number | null) => {
@@ -64,7 +64,9 @@ export default function AdminSidebar() {
 
       {/* NAV */}
       <nav className="flex-1 px-3 py-6 space-y-1">
-        {navItems.map((item) => {
+        {navItems
+          .filter((item) => roleCode === 0 || (typeof hasPermission === "function" && hasPermission(item.permission)))
+          .map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
 

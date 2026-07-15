@@ -5,8 +5,11 @@ import Link from "next/link";
 import { onSnapshot, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Pencil, Trash2, Package } from "lucide-react";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 export default function AdminProductsPage() {
+  const { roleCode, hasPermission } = useAdminAuthStore();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,6 +52,11 @@ export default function AdminProductsPage() {
         Loading products...
       </div>
     );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage products"));
+  if (!canManage) {
+    return <AccessDenied />;
   }
 
   return (

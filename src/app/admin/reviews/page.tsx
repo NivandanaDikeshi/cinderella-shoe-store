@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase/config";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 import {
   collection,
   getDocs,
@@ -22,6 +24,7 @@ interface Review {
 }
 
 export default function AdminReviewsPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,6 +84,19 @@ export default function AdminReviewsPage() {
       </div>
     );
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
+    );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage reviews"));
+  if (!canManage) {
+    return <AccessDenied />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">

@@ -4,8 +4,11 @@ import ProductForm from "@/components/products/ProductForm";
 import Link from "next/link";
 import { ArrowLeft, PackagePlus } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 export default function CreateProductPage() {
+  const { roleCode, hasPermission, loading } = useAdminAuthStore();
   // Simple local toast implementation (replaces missing @/hooks/useToast)
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
@@ -32,6 +35,19 @@ export default function CreateProductPage() {
       </div>
     </div>
   ) : null;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600 font-semibold">
+        Loading...
+      </div>
+    );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage products"));
+  if (!canManage) {
+    return <AccessDenied />;
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-50">

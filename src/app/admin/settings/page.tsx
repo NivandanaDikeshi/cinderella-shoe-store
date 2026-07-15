@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import settingsService from "@/services/settingsService";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 import BusinessSettings from "@/components/settings/BusinessSettings";
 import ShippingSettings from "@/components/settings/ShippingSettings";
 import PolicySettings from "@/components/settings/PolicySettings";
 
 export default function SettingsPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const [settings, setSettings] = useState<any>({});
 
   const [loading, setLoading] = useState(true);
@@ -73,7 +75,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <p className="text-gray-500 text-lg">
@@ -81,6 +83,11 @@ export default function SettingsPage() {
         </p>
       </div>
     );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage settings"));
+  if (!canManage) {
+    return <AccessDenied />;
   }
 
   return (

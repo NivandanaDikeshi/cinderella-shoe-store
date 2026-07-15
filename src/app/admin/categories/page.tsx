@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 /* =========================
    CATEGORY MODAL (MODERN)
@@ -93,6 +95,7 @@ function CategoryModal({
    PAGE
 ========================= */
 export default function CategoriesPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,6 +122,19 @@ export default function CategoriesPage() {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
+    );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage products"));
+  if (!canManage) {
+    return <AccessDenied />;
+  }
 
   return (
     <div className="space-y-8">

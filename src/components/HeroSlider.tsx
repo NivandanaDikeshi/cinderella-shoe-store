@@ -1,115 +1,388 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const slides = [
   {
     id: 1,
     image: "/images/hero1.jpg",
+    tag: "New Collection",
     title: "Elegant Heels",
-    subtitle: "Luxury fashion for every special occasion",
+    subtitle:
+      "Luxury footwear designed to make every special moment unforgettable.",
   },
   {
     id: 2,
     image: "/images/hero2.jpg",
+    tag: "Premium Comfort",
     title: "Stylish Sandals",
-    subtitle: "Comfort and beauty in every step",
+    subtitle:
+      "Beautiful designs crafted with comfort and confidence in every step.",
   },
   {
     id: 3,
     image: "/images/hero3.jpg",
+    tag: "Everyday Elegance",
     title: "Modern Flats",
-    subtitle: "Everyday essentials with timeless elegance",
+    subtitle:
+      "Timeless essentials that complete your everyday fashion look.",
   },
 ];
 
+
 export default function HeroSlider() {
-  const [current, setCurrent] = useState(0);
+
+  const [current,setCurrent] = useState(0);
+
 
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % slides.length);
+    setCurrent((prev)=>
+      (prev + 1) % slides.length
+    );
   };
+
 
   const prevSlide = () => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrent((prev)=>
+      (prev - 1 + slides.length) % slides.length
+    );
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 4000);
 
-    return () => clearInterval(timer);
-  }, []);
+  useEffect(()=>{
+
+    const timer=setInterval(()=>{
+      nextSlide();
+    },5000);
+
+
+    return ()=>clearInterval(timer);
+
+  },[]);
+
+
 
   return (
+
     <div className="relative w-full max-w-[560px]">
-      {/* SLIDER CARD */}
-      <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl border border-pink-100">
-        <div className="relative h-[500px] w-full">
-          {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-                index === current
-                  ? "opacity-100 translate-x-0 z-10"
-                  : "opacity-0 translate-x-8 z-0"
-              }`}
-            >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="h-full w-full object-cover"
-              />
 
-              {/* overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+      <div
+        className="
+        relative
+        overflow-hidden
+        rounded-[2.5rem]
+        border
+        border-border
+        bg-white
+        shadow-[0_25px_60px_rgba(235,19,125,0.15)]
+        "
+      >
 
-              {/* text */}
-              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                <h3 className="text-3xl font-bold">{slide.title}</h3>
-                <p className="mt-2 text-sm md:text-base text-white/90">
-                  {slide.subtitle}
-                </p>
-              </div>
-            </div>
-          ))}
+
+        {/* IMAGE AREA */}
+
+        <div className="
+          relative
+          h-[420px]
+          sm:h-[520px]
+          "
+        >
+
+        <AnimatePresence mode="wait">
+
+
+        <motion.div
+
+          key={slides[current].id}
+
+          initial={{
+            opacity:0,
+            scale:1.05
+          }}
+
+          animate={{
+            opacity:1,
+            scale:1
+          }}
+
+          exit={{
+            opacity:0,
+            scale:0.98
+          }}
+
+          transition={{
+            duration:0.7
+          }}
+
+          className="
+          absolute
+          inset-0
+          "
+
+        >
+
+
+          <Image
+
+            src={slides[current].image}
+
+            alt={slides[current].title}
+
+            fill
+
+            priority
+
+            className="
+            object-cover
+            "
+
+          />
+
+
+          {/* Luxury Overlay */}
+
+          <div
+          className="
+          absolute
+          inset-0
+          bg-gradient-to-t
+          from-black/70
+          via-black/20
+          to-transparent
+          "
+          />
+
+
+
+          {/* CONTENT */}
+
+          <div
+          className="
+          absolute
+          bottom-0
+          left-0
+          right-0
+          p-6
+          sm:p-8
+          text-white
+          "
+          >
+
+
+          <div
+          className="
+          flex
+          items-center
+          gap-2
+          text-xs
+          uppercase
+          tracking-[0.25em]
+          text-pink-100
+          "
+          >
+
+          <Sparkles size={14}/>
+
+          {slides[current].tag}
+
+          </div>
+
+
+
+          <h2
+          className="
+          mt-3
+          text-3xl
+          sm:text-4xl
+          font-bold
+          "
+          >
+
+          {slides[current].title}
+
+          </h2>
+
+
+
+          <p
+          className="
+          mt-3
+          max-w-md
+          text-sm
+          sm:text-base
+          text-white/90
+          "
+          >
+
+          {slides[current].subtitle}
+
+          </p>
+
+
+
+          <Link
+
+          href="/shop"
+
+          className="
+          mt-5
+          inline-flex
+          items-center
+          gap-2
+          rounded-full
+          bg-brand-primary
+          px-6
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          transition
+          hover:bg-brand-hover
+          "
+
+          >
+
+          Shop Now
+
+          <ArrowRight size={16}/>
+
+          </Link>
+
+
+          </div>
+
+
+        </motion.div>
+
+
+        </AnimatePresence>
+
+
         </div>
 
-        {/* arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg backdrop-blur hover:bg-white transition"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="h-5 w-5 text-gray-800" />
-        </button>
+
+
+
+        {/* ARROWS */}
+
 
         <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg backdrop-blur hover:bg-white transition"
-          aria-label="Next slide"
+
+        onClick={prevSlide}
+
+        className="
+        absolute
+        left-4
+        top-1/2
+        z-20
+        -translate-y-1/2
+        flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        rounded-full
+        bg-white/90
+        shadow-lg
+        transition
+        hover:bg-brand-primary
+        hover:text-white
+        "
+
         >
-          <ChevronRight className="h-5 w-5 text-gray-800" />
+
+        <ChevronLeft size={20}/>
+
         </button>
 
-        {/* dots */}
-        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-          {slides.map((_, index) => (
+
+
+        <button
+
+        onClick={nextSlide}
+
+        className="
+        absolute
+        right-4
+        top-1/2
+        z-20
+        -translate-y-1/2
+        flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        rounded-full
+        bg-white/90
+        shadow-lg
+        transition
+        hover:bg-brand-primary
+        hover:text-white
+        "
+
+        >
+
+        <ChevronRight size={20}/>
+
+        </button>
+
+
+
+
+        {/* DOTS */}
+
+        <div
+        className="
+        absolute
+        bottom-5
+        left-1/2
+        z-20
+        flex
+        -translate-x-1/2
+        gap-2
+        "
+        >
+
+        {
+          slides.map((slide,index)=>(
+
             <button
-              key={index}
-              onClick={() => setCurrent(index)}
-              className={`h-2.5 rounded-full transition-all ${
-                current === index
-                  ? "w-8 bg-white"
-                  : "w-2.5 bg-white/60 hover:bg-white"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
+
+            key={slide.id}
+
+            onClick={()=>setCurrent(index)}
+
+            className={`
+            h-2.5
+            rounded-full
+            transition-all
+            ${
+              current===index
+              ?
+              "w-8 bg-brand-primary"
+              :
+              "w-2.5 bg-white/70"
+            }
+            `}
+
             />
-          ))}
+
+          ))
+        }
+
         </div>
+
+
+
       </div>
+
+
     </div>
+
   );
+
 }

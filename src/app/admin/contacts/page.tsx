@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 import {
   Mail,
   User,
@@ -13,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function AdminContactPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,6 +80,19 @@ export default function AdminContactPage() {
     if (!timestamp?.seconds) return "Just now";
     return new Date(timestamp.seconds * 1000).toLocaleString();
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
+    );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage contacts"));
+  if (!canManage) {
+    return <AccessDenied />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">

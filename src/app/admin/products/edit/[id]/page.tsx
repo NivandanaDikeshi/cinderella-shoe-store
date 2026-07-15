@@ -6,8 +6,11 @@ import productService from "@/services/productService";
 import { db } from "@/lib/firebase/config";
 import { doc, updateDoc } from "firebase/firestore";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 export default function EditProductPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -116,12 +119,17 @@ export default function EditProductPage() {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-500 font-semibold">
         Loading product...
       </div>
     );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage products"));
+  if (!canManage) {
+    return <AccessDenied />;
   }
 
   return (

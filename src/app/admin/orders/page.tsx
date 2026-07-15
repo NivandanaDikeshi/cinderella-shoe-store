@@ -25,6 +25,8 @@ import {
   CircleDollarSign,
   ShoppingBag,
 } from "lucide-react";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
+import AccessDenied from "@/components/admin/AccessDenied";
 
 interface OrderItem {
   id?: string;
@@ -79,6 +81,7 @@ const STATUS_TABS = [
 ];
 
 export default function OrderManagementPage() {
+  const { roleCode, hasPermission, loading: authLoading } = useAdminAuthStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -261,12 +264,17 @@ export default function OrderManagementPage() {
     return { totalOrders, pending, processing, revenue };
   }, [orders]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-500 font-semibold">
         Loading orders...
       </div>
     );
+  }
+
+  const canManage = roleCode === 0 || (typeof hasPermission === "function" && hasPermission("manage orders"));
+  if (!canManage) {
+    return <AccessDenied />;
   }
 
   return (

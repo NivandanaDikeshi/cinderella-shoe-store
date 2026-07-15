@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart, ShoppingBag, Eye, Search, SlidersHorizontal, X } from "lucide-react";
 
-import productService from "@/services/productService";
+import { getProducts } from "@/services/productService";
 import useCartStore from "@/store/cartStore";
 import useWishlistStore from "@/store/wishlistStore";
 
@@ -44,7 +44,7 @@ function ShopPageInner() {
     let cancelled = false;
     const loadProducts = async () => {
       setLoading(true);
-      const data = await productService.getProducts();
+      const data = await getProducts();
       if (!cancelled) {
         setProducts((data as Product[]) || []);
         setLoading(false);
@@ -349,12 +349,12 @@ function ShopPageInner() {
                         />
                       </button>
 
-                      {/* Quick view - desktop hover overlay */}
+                      {/* View Product- desktop hover overlay */}
                       <button
                         onClick={() => router.push(`/product/${product.id}`)}
                         className="absolute inset-x-3 bottom-3 hidden sm:flex items-center justify-center gap-2 rounded-full bg-[#2B1620]/90 backdrop-blur py-2.5 text-xs font-medium text-white opacity-0 translate-y-2 transition duration-300 group-hover:opacity-100 group-hover:translate-y-0"
                       >
-                        <Eye size={14} /> Quick View
+                        <Eye size={14} /> View Product
                       </button>
                     </div>
 
