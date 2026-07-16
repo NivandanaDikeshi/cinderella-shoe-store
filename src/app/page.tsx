@@ -13,9 +13,6 @@ import {
   Sparkles,
   Truck,
   ShieldCheck,
-  ChevronLeft,
-  ChevronRight,
-  Check,
   Plus,
   Minus,
   X,
@@ -27,41 +24,7 @@ import { getProducts } from "@/services/productService";
 import useCartStore from "@/store/cartStore";
 import useWishlistStore from "@/store/wishlistStore";
 import { MOCK_PRODUCTS, Product } from "@/constants/mockProducts";
-
-/* ------------------------------------------------------------------ */
-/*  Design tokens (kept as inline Tailwind values so nothing else in   */
-/*  the app needs to change). Rose is now #EA147D — a vivid magenta-   */
-/*  pink — everything around it is tuned to read calmer, warmer, and   */
-/*  more editorial.                                                    */
-/*                                                                      */
-/*  ink       #1E0E16   headings / primary text                        */
-/*  rose      #EA147D   brand accent                                   */
-/*  roseDeep  #B60F61   hover / pressed states                         */
-/*  gold      #C9A46B   rating stars, dividers, small accents          */
-/*  muted     #8C6169   secondary / caption text                       */
-/*  blush     #FBEDEF   surfaces, tints                                */
-/*  hairline  #F0DEE1   borders                                        */
-/*  canvas    #FFFBF8   page background                                */
-/*                                                                      */
-/*  Fonts: pair the existing display serif with a cleaner grotesk for  */
-/*  body copy so long text reads calmer next to the display headings.  */
-/*  Add to tailwind.config.js:                                         */
-/*    fontFamily: {                                                    */
-/*      display: ['var(--font-playfair)', 'serif'],                    */
-/*      sans: ['var(--font-manrope)', 'sans-serif'],                   */
-/*    }                                                                 */
-/*  And in layout.tsx:                                                 */
-/*    import { Playfair_Display, Manrope } from 'next/font/google';    */
-/*    const playfair = Playfair_Display({ subsets: ['latin'],          */
-/*      variable: '--font-playfair', weight: ['500','700','900'] });   */
-/*    const manrope = Manrope({ subsets: ['latin'],                    */
-/*      variable: '--font-manrope', weight: ['400','500','600','700']});*/
-/*    <body className={`${playfair.variable} ${manrope.variable}`}>    */
-/* ------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------ */
-/*  Shared helpers                                                     */
-/* ------------------------------------------------------------------ */
+import HeroSlider from "@/components/HeroSlider";
 
 function getProductImage(product: Product) {
   if (product.images && product.images.length > 0) return product.images[0];
@@ -72,11 +35,6 @@ function formatPrice(price: number | string) {
   return `LKR ${Number(price).toLocaleString()}`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  SectionEyebrow — small recurring signature: a rose→gold rule       */
-/*  under every section label, a quiet echo of the "glass slipper"     */
-/*  motif without being literal.                                       */
-/* ------------------------------------------------------------------ */
 
 function SectionEyebrow({
   children,
@@ -87,27 +45,17 @@ function SectionEyebrow({
 }) {
   return (
     <div className={align === "center" ? "flex flex-col items-center" : ""}>
-      <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#EA147D]">
+      <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-pink-500">
         {children}
       </span>
-      <span
-        className="mt-2.5 block h-[3px] w-10 rounded-full"
-        style={{
-          background: "linear-gradient(90deg, #EA147D 0%, #C9A46B 100%)",
-        }}
-      />
+      <span className="mt-2.5 block h-[3px] w-10 rounded-full bg-gradient-to-r from-pink-600 to-rose-500" />
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  StarRating — gold instead of stock yellow so ratings read as part  */
-/*  of the palette rather than a generic browser-default star.         */
-/* ------------------------------------------------------------------ */
-
 function StarRating({ rating, size = 11 }: { rating?: number; size?: number }) {
   return (
-    <div className="flex text-[#C9A46B]">
+    <div className="flex text-amber-400">
       {Array.from({ length: 5 }).map((_, idx) => (
         <Star
           key={idx}
@@ -121,18 +69,13 @@ function StarRating({ rating, size = 11 }: { rating?: number; size?: number }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  ProductCard — used by New Arrivals, Featured, and Best Sellers.    */
-/*  Previously this markup was duplicated three times; badge label,    */
-/*  color, and quick-actions now come from props.                      */
-/* ------------------------------------------------------------------ */
 
 type BadgeVariant = "new" | "featured" | "bestseller";
 
 const BADGE_STYLES: Record<BadgeVariant, string> = {
-  new: "bg-white text-[#EA147D]",
-  featured: "bg-[#EA147D] text-white",
-  bestseller: "bg-[#1E0E16] text-white",
+  new: "bg-white text-pink-600",
+  featured: "bg-gradient-to-r from-pink-600 to-rose-500 text-white",
+  bestseller: "bg-gray-900 text-white",
 };
 
 interface ProductCardProps {
@@ -164,7 +107,7 @@ function ProductCard({
       viewport={{ once: true }}
       className="group relative"
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-[#F5E3E1] shadow-sm border border-[#F0DEE1] transition-shadow duration-300 group-hover:shadow-lg">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-pink-50 border border-pink-100 shadow-sm transition-shadow duration-300 group-hover:shadow-xl">
         <img
           src={getProductImage(product)}
           alt={product.name}
@@ -186,20 +129,19 @@ function ProductCard({
           }}
           aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           aria-pressed={isWishlisted}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
         >
           <Heart
             size={15}
-            fill={isWishlisted ? "#EA147D" : "none"}
-            stroke={isWishlisted ? "#EA147D" : "#1E0E16"}
+            fill={isWishlisted ? "#DB2777" : "none"}
+            stroke={isWishlisted ? "#DB2777" : "#111827"}
           />
         </button>
 
-        {/* Quick Shop: visible on hover for desktop, always visible on touch devices via opacity-100 on small screens is skipped in favor of a persistent bottom strip on tap-friendly layouts */}
         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
           <button
             onClick={() => onQuickView(product)}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-xs font-bold uppercase tracking-wider text-[#1E0E16] shadow-md transition hover:bg-[#FBEDEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D]"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-xs font-bold uppercase tracking-wider text-gray-900 shadow-md transition hover:bg-pink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
           >
             <Eye size={14} /> Quick Shop
           </button>
@@ -208,24 +150,24 @@ function ProductCard({
 
       <div className="mt-4 flex items-start justify-between gap-2 px-1">
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#8C6169]">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             {product.category}
           </h3>
-          <h4 className="mt-1 font-display text-[15px] font-bold leading-snug text-[#1E0E16] group-hover:text-[#EA147D] transition-colors line-clamp-1">
+          <h4 className="mt-1 text-[15px] font-semibold leading-snug text-gray-900 group-hover:text-pink-600 transition-colors line-clamp-1">
             {product.name}
           </h4>
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-[#8C6169]">
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
             <StarRating rating={product.rating} />
             <span>({product.reviewsCount || 10})</span>
           </div>
-          <p className="mt-1.5 font-sans text-sm font-bold text-[#EA147D]">
+          <p className="mt-1.5 text-sm font-bold text-pink-600">
             {formatPrice(product.price)}
           </p>
         </div>
 
         <button
           onClick={() => onQuickView(product)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#F0DEE1] bg-white text-[#1E0E16] transition hover:bg-[#EA147D] hover:text-white hover:border-[#EA147D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-pink-100 bg-white text-gray-900 transition hover:bg-pink-600 hover:text-white hover:border-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
           aria-label={`Select size and color for ${product.name}`}
         >
           <ShoppingBag size={14} />
@@ -236,17 +178,17 @@ function ProductCard({
 }
 
 /* ------------------------------------------------------------------ */
-/*  ProductCardSkeleton — shown while the initial fetch is in flight   */
+/*  ProductCardSkeleton                                                */
 /* ------------------------------------------------------------------ */
 
 function ProductCardSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="aspect-[3/4] rounded-3xl bg-[#F5E3E1] border border-[#F0DEE1]" />
+      <div className="aspect-[3/4] rounded-[2rem] bg-pink-50 border border-pink-100" />
       <div className="mt-4 space-y-2 px-1">
-        <div className="h-2.5 w-16 rounded-full bg-[#F0DEE1]" />
-        <div className="h-3.5 w-3/4 rounded-full bg-[#F0DEE1]" />
-        <div className="h-3 w-20 rounded-full bg-[#F0DEE1]" />
+        <div className="h-2.5 w-16 rounded-full bg-pink-100" />
+        <div className="h-3.5 w-3/4 rounded-full bg-pink-100" />
+        <div className="h-3 w-20 rounded-full bg-pink-100" />
       </div>
     </div>
   );
@@ -265,28 +207,19 @@ export default function Home() {
   const [dbProducts, setDbProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Active tab for New Arrivals
   const [newArrivalTab, setNewArrivalTab] = useState("All");
-
-  // Hero Slider State
-  const [heroIndex, setHeroIndex] = useState(0);
-
-  // Testimonials Slider State
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
-  // Quick View Modal State
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewSize, setQuickViewSize] = useState("");
   const [quickViewColor, setQuickViewColor] = useState("");
   const [quickViewQty, setQuickViewQty] = useState(1);
   const [quickViewError, setQuickViewError] = useState("");
 
-  // Newsletter State
   const [email, setEmail] = useState("");
   const [newsletterError, setNewsletterError] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  // Load products from DB (with fallback to MOCK_PRODUCTS)
   useEffect(() => {
     let active = true;
     const fetchProducts = async () => {
@@ -313,89 +246,37 @@ export default function Home() {
     };
   }, []);
 
-  // Sync products list
   const allProducts = useMemo(() => {
     return dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
   }, [dbProducts]);
 
-  // Hero slides data
-  const heroSlides = useMemo(
-    () => [
-      {
-        image: "/images/hero1.jpg",
-        tag: "Step Into Elegance",
-        title: "Find Your Perfect Pair",
-        desc: "Discover stylish footwear designed to bring confidence, comfort, and elegance to every step you take.",
-        link: "/shop?category=Heels",
-      },
-      {
-        image: "/images/hero2.jpg",
-        tag: "New Season Collection",
-        title: "Style That Speaks for You",
-        desc: "Explore beautiful designs crafted for every occasion, from everyday wear to your most special moments.",
-        link: "/shop?category=Heels",
-      },
-      {
-        image: "/images/hero3.jpg",
-        tag: "Fashion Meets Comfort",
-        title: "Walk with Confidence",
-        desc: "Experience the perfect blend of modern fashion, premium quality, and all-day comfort in every pair.",
-        link: "/shop?category=Heels",
-      },
-    ],
-    []
-  );
-
-  // Auto-scroll Hero Slider — paused if the visitor prefers reduced motion
-  useEffect(() => {
-    if (reduceMotion) return;
-    const timer = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 5500);
-    return () => clearInterval(timer);
-  }, [heroSlides.length, reduceMotion]);
-
-  const handlePrevHero = () => {
-    setHeroIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  const handleNextHero = () => {
-    setHeroIndex((prev) => (prev + 1) % heroSlides.length);
-  };
-
-  // Categories list
   const categorySections = [
     {
       name: "Heels",
       subtitle: "Editorial Heights",
       desc: "Pointed toes, crystal details, and stiletto profiles designed to turn heads.",
       img: "/images/heels.jpg",
-      span: "md:col-span-2",
     },
     {
       name: "Sandals",
       subtitle: "Casual Elegance",
       desc: "Strappy leather structures that blend coastal freedom with premium detail.",
       img: "/images/sandals.jpg",
-      span: "md:col-span-1",
     },
     {
       name: "Flats",
       subtitle: "Everyday Statement",
       desc: "Low-profile comfort dressed in rich textures and elegant buckle finishes.",
       img: "/images/flats.jpg",
-      span: "md:col-span-1",
     },
     {
       name: "Slippers",
       subtitle: "Plush Indulgence",
       desc: "Premium cushioning and warmth for rest and off-duty weekend relaxation.",
       img: "/images/slippers.jpg",
-      span: "md:col-span-2",
     },
   ];
 
-  // Filtered lists
   const newArrivals = useMemo(() => allProducts.slice(0, 4), [allProducts]);
 
   const filteredNewArrivals = useMemo(
@@ -416,7 +297,6 @@ export default function Home() {
     return bestSellers.length > 0 ? bestSellers.slice(0, 4) : allProducts.slice(4, 8);
   }, [allProducts]);
 
-  // Testimonials data
   const testimonials = [
     {
       quote:
@@ -444,7 +324,6 @@ export default function Home() {
     },
   ];
 
-  // Auto-scroll Testimonials — paused if reduced motion is preferred
   useEffect(() => {
     if (reduceMotion) return;
     const timer = setInterval(() => {
@@ -453,15 +332,17 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [testimonials.length, reduceMotion]);
 
-  // Instagram photos
   const instagramPhotos = [
-    { src: "/images/insta_heels.jpg", tag: "@CinderellaWear" },
-    { src: "/images/insta_sandals.jpg", tag: "@CinderellaWear" },
-    { src: "/images/insta_flats.jpg", tag: "@CinderellaWear" },
-    { src: "/images/insta_bridal.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_1.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_2.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_3.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_4.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_5.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_6.jpg", tag: "@CinderellaWear" }, 
+    { src: "/images/insta_7.jpg", tag: "@CinderellaWear" },
+    { src: "/images/insta_8.jpg", tag: "@CinderellaWear" },
   ];
 
-  // Open Quick View
   const handleOpenQuickView = (product: Product) => {
     setSelectedProduct(product);
     setQuickViewSize(product.sizes?.[0] || "");
@@ -470,7 +351,6 @@ export default function Home() {
     setQuickViewError("");
   };
 
-  // Add item from Quick View to Cart
   const handleConfirmAddToCart = () => {
     if (!selectedProduct) return;
     if (!quickViewSize) {
@@ -498,7 +378,6 @@ export default function Home() {
     router.push("/cart");
   };
 
-  // Toggle wishlist from card.
   // NOTE: id is always normalized to a string here — the wishlist store
   // keys entries by string id, so this must match isInWishlist(String(id))
   // everywhere below or the heart icon will desync from the store.
@@ -511,7 +390,6 @@ export default function Home() {
     });
   };
 
-  // Handle email signup
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
@@ -525,170 +403,24 @@ export default function Home() {
   };
 
   return (
-    <main className="overflow-hidden bg-[#FFFBF8] text-[#1E0E16] antialiased">
+    <main className="overflow-hidden bg-white text-gray-900 antialiased">
       {/* 1. HERO SECTION */}
-      <section className="relative flex min-h-[90vh] items-center overflow-hidden bg-gradient-to-b from-[#FCE9F0] via-[#FDF3F6] to-white lg:min-h-screen">
-        {/* Abstract Glow Elements */}
-        <div className="absolute -left-36 -top-36 h-[500px] w-[500px] rounded-full bg-[#EA147D]/5 blur-[120px]" />
-        <div className="absolute -right-20 bottom-0 h-[400px] w-[400px] rounded-full bg-[#C9A46B]/10 blur-[100px]" />
+      <HeroSlider />
 
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
-            {/* HERO LEFT - TEXT CONTENT */}
-            <div className="relative z-10 lg:col-span-6">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EA147D]/10 px-4 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#EA147D]">
-                <Sparkles size={12} className="motion-safe:animate-pulse" />
-                Sri Lanka's Premium Footwear Boutique
-              </span>
-
-              <div className="mt-6 relative h-[220px] sm:h-[260px] md:h-[300px] lg:h-[350px] overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={heroIndex}
-                    initial={{ opacity: 0, y: reduceMotion ? 0 : 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: reduceMotion ? 0 : -30 }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 flex flex-col justify-center"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[#8C6169]">
-                      {heroSlides[heroIndex].tag}
-                    </p>
-                    <h1 className="mt-3 font-display text-4xl font-black leading-[1.06] tracking-tight text-[#1E0E16] sm:text-5xl md:text-6xl lg:text-[4.5rem]">
-                      {heroSlides[heroIndex].title}
-                    </h1>
-                    <span
-                      className="mt-4 block h-[3px] w-16 rounded-full"
-                      style={{ background: "linear-gradient(90deg, #EA147D 0%, #C9A46B 100%)" }}
-                    />
-                    <p className="mt-5 max-w-lg text-sm leading-relaxed text-[#8C6169] sm:text-base md:text-[17px]">
-                      {heroSlides[heroIndex].desc}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Link
-                  href="/shop"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#EA147D] to-[#F0508E] px-8 py-4 text-sm font-semibold tracking-wide text-white shadow-[0_8px_30px_rgba(234,20,125,0.25)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_8px_35px_rgba(234,20,125,0.4)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
-                >
-                  Shop New Arrivals
-                  <ArrowRight size={16} />
-                </Link>
-                <Link
-                  href="/about"
-                  className="inline-flex items-center justify-center rounded-full border border-[#F0DEE1] bg-white/70 px-8 py-4 text-sm font-semibold tracking-wide text-[#1E0E16] backdrop-blur-md transition duration-300 hover:bg-[#FBEDEF] hover:border-[#EA147D]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
-                >
-                  Our Story
-                </Link>
-              </div>
-
-              {/* Slider Controls */}
-              <div className="mt-12 flex items-center gap-4">
-                <div className="flex gap-2">
-                  <button
-                    onClick={handlePrevHero}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#F0DEE1] bg-white text-[#1E0E16] transition duration-200 hover:border-[#EA147D] hover:bg-[#FBEDEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D]"
-                    aria-label="Previous slide"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button
-                    onClick={handleNextHero}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#F0DEE1] bg-white text-[#1E0E16] transition duration-200 hover:border-[#EA147D] hover:bg-[#FBEDEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D]"
-                    aria-label="Next slide"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-
-                {/* Dots indicator */}
-                <div className="flex gap-1.5" role="tablist" aria-label="Hero slides">
-                  {heroSlides.map((slide, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setHeroIndex(idx)}
-                      role="tab"
-                      aria-selected={heroIndex === idx}
-                      aria-label={`Show ${slide.title}`}
-                      className={`h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] ${
-                        heroIndex === idx ? "w-6 bg-[#EA147D]" : "w-2 bg-[#F0DEE1]"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* HERO RIGHT - ANIMATED GALLERY IMAGE */}
-            <div className="relative flex justify-center lg:col-span-6">
-              <div className="relative h-[450px] w-full max-w-[340px] overflow-hidden rounded-[2.5rem] border border-[#F0DEE1] bg-white p-3 shadow-2xl sm:h-[550px] sm:max-w-[420px] md:max-w-[460px] lg:h-[600px] lg:max-w-[500px]">
-                <div className="absolute inset-4 rounded-[2rem] border border-[#EA147D]/10 pointer-events-none z-20" />
-
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={heroIndex}
-                    initial={{ opacity: 0, scale: reduceMotion ? 1 : 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.98 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative h-full w-full overflow-hidden rounded-[2rem]"
-                  >
-                    <img
-                      src={heroSlides[heroIndex].image}
-                      alt={heroSlides[heroIndex].title}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
-
-                    <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white z-10">
-                      <div>
-                        <span className="text-[10px] font-semibold uppercase tracking-widest text-[#FDF0F5]">Comfort First</span>
-                        <h4 className="font-display text-lg font-bold">{heroSlides[heroIndex].title}</h4>
-                      </div>
-                      <Link
-                        href="/shop"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white transition hover:bg-white hover:text-[#EA147D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                        aria-label={`Shop ${heroSlides[heroIndex].title}`}
-                      >
-                        <ArrowRight size={16} />
-                      </Link>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Float Card Trust Indicator */}
-              <div className="absolute -bottom-6 -left-4 hidden items-center gap-3 rounded-2xl border border-[#FBEDEF] bg-white/90 p-4 shadow-lg backdrop-blur-md sm:flex">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EA147D]/10 text-[#EA147D]">
-                  <Truck size={20} />
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold text-[#8C6169] uppercase tracking-wider">Fast Delivery</p>
-                  <p className="text-xs font-semibold text-[#1E0E16]">Cash on delivery</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. FEATURED CATEGORIES */}
+      {/* 2. FEATURED CATEGORIES — single row, four equal cards, tighter side gutters */}
       <section className="bg-white py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-3 sm:px-5 lg:px-6">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow align="center">Curated Collections</SectionEyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
               Shop by Silhouette
             </h2>
-            <p className="mt-4 text-sm text-[#8C6169] sm:text-base">
+            <p className="mt-4 text-sm text-gray-600 sm:text-base">
               Aisle, boardroom, or a quiet evening at home — find the shape built for where you're headed.
             </p>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:gap-8">
+          <div className="mt-12 grid grid-cols-2 gap-5 sm:gap-6 lg:grid-cols-4 lg:gap-7">
             {categorySections.map((cat, i) => (
               <motion.div
                 key={cat.name}
@@ -696,36 +428,53 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: reduceMotion ? 0 : i * 0.1 }}
                 viewport={{ once: true }}
-                className={`group relative overflow-hidden rounded-[2rem] border border-[#F0DEE1] bg-[#FBEDEF] shadow-sm transition-all duration-500 hover:shadow-xl ${cat.span}`}
+                className="group relative"
               >
-                <div className="relative h-72 overflow-hidden sm:h-80 md:h-[350px]">
-                  <img
-                    src={cat.img}
-                    alt={cat.name}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1E0E16]/75 via-[#1E0E16]/20 to-transparent" />
-                </div>
+                <Link
+                  href={`/shop?category=${encodeURIComponent(cat.name)}`}
+                  className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded-[1.75rem]"
+                >
+                  <div className="relative overflow-hidden rounded-[1.75rem] border border-pink-100/80 bg-white shadow-sm transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-2xl group-hover:shadow-pink-200/40">
+                    {/* Image */}
+                    <div className="relative h-56 overflow-hidden sm:h-64 md:h-80">
+                      <img
+                        src={cat.img}
+                        alt={cat.name}
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent transition-opacity duration-500 group-hover:from-black/85" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white md:p-8">
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-[#FDF0F5]/85">
-                    {cat.subtitle}
-                  </span>
-                  <h3 className="mt-1 font-display text-2xl font-black sm:text-3xl">{cat.name}</h3>
-                  <p className="mt-2 line-clamp-2 text-xs text-[#FDF0F5]/80 sm:text-sm">{cat.desc}</p>
-                  <div className="mt-5 flex items-center justify-between">
-                    <Link
-                      href={`/shop?category=${encodeURIComponent(cat.name)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
-                    >
-                      Browse {cat.name}
-                      <ArrowRight size={12} />
-                    </Link>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white transition-colors duration-300 group-hover:bg-white group-hover:text-[#EA147D]">
-                      <ArrowRight size={18} />
+                      {/* Decorative ring on hover */}
+                      <div className="pointer-events-none absolute inset-3 rounded-[1.4rem] border border-white/0 transition-all duration-500 group-hover:border-white/25" />
+
+                      {/* Count / subtitle pill */}
+                      <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-pink-600 shadow-sm backdrop-blur-sm sm:text-[10px]">
+                        {cat.subtitle}
+                      </span>
+                    </div>
+
+                    {/* Text content overlay */}
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5 md:p-6">
+                      <h3 className="text-xl font-bold tracking-tight sm:text-2xl md:text-[1.65rem]">
+                        {cat.name}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 text-[11px] leading-relaxed text-pink-50/85 sm:text-xs">
+                        {cat.desc}
+                      </p>
+
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-white sm:text-xs">
+                        <span className="relative">
+                          Shop Now
+                          <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-white transition-all duration-300 group-hover:w-full" />
+                        </span>
+                        <ArrowRight
+                          size={13}
+                          className="transition-transform duration-300 group-hover:translate-x-1"
+                        />
+                      </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -733,17 +482,16 @@ export default function Home() {
       </section>
 
       {/* 3. NEW ARRIVALS */}
-      <section className="bg-gradient-to-b from-white to-[#FDF3F6] py-16 sm:py-24">
+      <section className="bg-gradient-to-b from-white to-pink-50/60 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
               <SectionEyebrow>Fresh Off The Bench</SectionEyebrow>
-              <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+              <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
                 New Arrivals
               </h2>
             </div>
 
-            {/* Filter Tabs */}
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter new arrivals by category">
               {["All", "Heels", "Sandals", "Flats"].map((tab) => (
                 <button
@@ -751,10 +499,10 @@ export default function Home() {
                   onClick={() => setNewArrivalTab(tab)}
                   role="tab"
                   aria-selected={newArrivalTab === tab}
-                  className={`rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2 ${
+                  className={`rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 ${
                     newArrivalTab === tab
-                      ? "bg-[#1E0E16] text-white"
-                      : "bg-white text-[#8C6169] border border-[#F0DEE1] hover:bg-[#FBEDEF]"
+                      ? "bg-gradient-to-r from-pink-600 to-rose-500 text-white"
+                      : "bg-white text-gray-600 border border-pink-100 hover:bg-pink-50"
                   }`}
                 >
                   {tab}
@@ -763,7 +511,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Grid list */}
           {loading ? (
             <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -787,13 +534,13 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#F0DEE1] bg-white/60 py-16 text-center">
-              <p className="text-sm text-[#8C6169]">
+            <div className="mt-10 flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-pink-200 bg-white/60 py-16 text-center">
+              <p className="text-sm text-gray-600">
                 No new {newArrivalTab.toLowerCase()} just yet — the next drop is on its way.
               </p>
               <button
                 onClick={() => setNewArrivalTab("All")}
-                className="mt-4 rounded-full bg-[#1E0E16] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#150910] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
+                className="mt-4 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-500 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
               >
                 View all new arrivals
               </button>
@@ -807,11 +554,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center mb-12">
             <SectionEyebrow align="center">Boutique Highlights</SectionEyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
-              Featured Pieces
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
+              Featured Products
             </h2>
-            <p className="mt-3 text-sm text-[#8C6169]">
-              Chosen by our stylist team for craftsmanship and detail that hold up to a closer look.
+            <p className="mt-3 text-sm text-gray-600">
+              Discover Cinderella’s signature styles — beautifully crafted footwear that blends timeless elegance, luxurious comfort, and everyday confidence.
             </p>
           </div>
 
@@ -836,14 +583,14 @@ export default function Home() {
       </section>
 
       {/* 5. BEST SELLING PRODUCTS */}
-      <section className="bg-gradient-to-b from-[#FDF3F6] to-white py-16 sm:py-24">
+      <section className="bg-gradient-to-b from-pink-50/60 to-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center mb-12">
             <SectionEyebrow align="center">Customer Favorites</SectionEyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
               Best Sellers
             </h2>
-            <p className="mt-3 text-sm text-[#8C6169]">
+            <p className="mt-3 text-sm text-gray-600">
               The most reordered, most reviewed, and fastest-selling styles this season.
             </p>
           </div>
@@ -871,16 +618,16 @@ export default function Home() {
       {/* 6. WHY SHOP WITH US */}
       <section className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-[#F0DEE1] bg-[#FBEDEF]/50 px-6 py-16 text-center sm:px-12 md:py-20">
-            <div className="absolute -left-12 -top-12 h-36 w-36 rounded-full bg-[#EA147D]/5 blur-2xl" />
-            <div className="absolute -bottom-16 right-0 h-44 w-44 rounded-full bg-[#C9A46B]/10 blur-2xl" />
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-pink-100 bg-pink-50/60 px-6 py-16 text-center sm:px-12 md:py-20">
+            <div className="absolute -left-12 -top-12 h-36 w-36 rounded-full bg-pink-300/20 blur-3xl" />
+            <div className="absolute -bottom-16 right-0 h-44 w-44 rounded-full bg-rose-200/30 blur-3xl" />
 
             <div className="relative z-10 mx-auto max-w-3xl">
               <SectionEyebrow align="center">Premium Standards</SectionEyebrow>
-              <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+              <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
                 The Cinderella Promise
               </h2>
-              <p className="mt-4 text-sm text-[#8C6169] sm:text-base leading-relaxed">
+              <p className="mt-4 text-sm text-gray-600 sm:text-base leading-relaxed">
                 Footwear shouldn't force a choice between comfort and elegance. Every pair is built with
                 cushioned support and tested for balance before it reaches you.
               </p>
@@ -889,35 +636,35 @@ export default function Home() {
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
-                  icon: <Sparkles className="h-6 w-6 text-[#EA147D]" />,
+                  icon: <Sparkles className="h-7 w-7 text-pink-600" />,
                   title: "Premium Materials",
                   desc: "Carefully sourced fabrics and soft synthetic leathers, built to last and to look it.",
                 },
                 {
-                  icon: <Star className="h-6 w-6 text-[#EA147D]" />,
+                  icon: <Star className="h-7 w-7 text-pink-600" />,
                   title: "Designed for Comfort",
                   desc: "A cushioned inner sole layer absorbs shock and eases pressure through a full day of wear.",
                 },
                 {
-                  icon: <Truck className="h-6 w-6 text-[#EA147D]" />,
+                  icon: <Truck className="h-7 w-7 text-pink-600" />,
                   title: "Fast Delivery",
                   desc: "Cash-on-delivery to your door across Colombo, Kandy, Negombo, and islandwide.",
                 },
                 {
-                  icon: <ShieldCheck className="h-6 w-6 text-[#EA147D]" />,
+                  icon: <ShieldCheck className="h-7 w-7 text-pink-600" />,
                   title: "Secure Checkout",
                   desc: "Pay on delivery or by direct bank transfer — whichever you trust more.",
                 },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="rounded-3xl border border-[#F0DEE1] bg-white p-6 shadow-sm transition hover:shadow-md"
+                  className="rounded-[2rem] border border-pink-100 bg-white p-6 shadow-sm hover:shadow-xl transition-all"
                 >
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FBEDEF] text-[#EA147D]">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-pink-50">
                     {item.icon}
                   </div>
-                  <h3 className="font-display text-base font-bold text-[#1E0E16]">{item.title}</h3>
-                  <p className="mt-2 text-xs text-[#8C6169] leading-relaxed">{item.desc}</p>
+                  <h3 className="text-base font-semibold text-gray-900">{item.title}</h3>
+                  <p className="mt-2 text-xs text-gray-600 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -925,103 +672,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. TRENDING COLLECTIONS */}
-      <section className="bg-white pb-16 sm:pb-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Promo Panel 1 */}
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-[#F0DEE1] bg-[#1E0E16] text-white">
-              <div className="absolute inset-0 opacity-40 transition-transform duration-700 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100">
-                <img src="/images/hero1.jpg" alt="" className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#1E0E16]/95 via-[#1E0E16]/75 to-transparent z-10" />
-
-              <div className="relative z-20 flex flex-col justify-center px-8 py-16 md:px-12 md:py-24 max-w-md">
-                <span className="text-xs font-semibold uppercase tracking-[0.28em] text-[#C9A46B]">Seasonal Luxury</span>
-                <h3 className="mt-3 font-display text-3xl font-black leading-tight sm:text-4xl">
-                  The Bridal Collection
-                </h3>
-                <p className="mt-4 text-xs text-[#FCE9F0]/85 sm:text-sm leading-relaxed">
-                  Pre-order custom wedding pairs fitted with extra-padded arches, made to last from
-                  the ceremony through the last dance.
-                </p>
-                <div className="mt-8">
-                  <Link
-                    href="/shop?category=Heels"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#1E0E16] shadow-md transition hover:bg-[#FBEDEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  >
-                    View Bridal Edit
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Promo Panel 2 */}
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-[#F0DEE1] bg-[#EA147D] text-white">
-              <div className="absolute inset-0 opacity-45 transition-transform duration-700 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100">
-                <img src="/images/about-hero.jpg" alt="" className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#EA147D]/95 via-[#EA147D]/75 to-transparent z-10" />
-
-              <div className="relative z-20 flex flex-col justify-center px-8 py-16 md:px-12 md:py-24 max-w-md">
-                <span className="text-xs font-semibold uppercase tracking-[0.28em] text-white/90">Daily Staples</span>
-                <h3 className="mt-3 font-display text-3xl font-black leading-tight sm:text-4xl">
-                  Casual Chic Comfort
-                </h3>
-                <p className="mt-4 text-xs text-[#FDF0F5]/85 sm:text-sm leading-relaxed">
-                  Breathable leathers and flexible cork soles, built for errands that shouldn't feel
-                  like a chore on your feet.
-                </p>
-                <div className="mt-8">
-                  <Link
-                    href="/shop?category=Sandals"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#EA147D] shadow-md transition hover:bg-[#FBEDEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  >
-                    Shop Sandals
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. CUSTOMER TESTIMONIALS */}
-      <section className="bg-gradient-to-b from-white to-[#FBEDEF]/40 py-16 sm:py-24">
+      {/* 7. CUSTOMER TESTIMONIALS */}
+      <section className="bg-gradient-to-b from-white to-pink-50/60 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow align="center">Real Stories</SectionEyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
               Loved by Cinderella Customers
             </h2>
           </div>
 
           <div className="mt-12 relative mx-auto max-w-4xl px-8">
-            <div className="relative overflow-hidden rounded-[2rem] border border-[#F0DEE1] bg-white p-8 shadow-sm md:p-12">
-              <span className="absolute right-8 top-6 font-display text-8xl font-black text-[#FBEDEF] pointer-events-none z-0">
+            <div className="relative overflow-hidden rounded-[2rem] border border-pink-100 bg-white p-8 shadow-sm md:p-12">
+              <span className="absolute right-8 top-6 text-8xl font-black text-pink-50 pointer-events-none z-0">
                 "
               </span>
 
               <div className="relative z-10" aria-live="polite">
                 <StarRating rating={testimonials[testimonialIndex].rating} size={16} />
 
-                <blockquote className="mt-6 font-display text-base italic leading-relaxed text-[#1E0E16] sm:text-lg md:text-xl">
+                <blockquote className="mt-6 text-base italic leading-relaxed text-gray-900 sm:text-lg md:text-xl">
                   "{testimonials[testimonialIndex].quote}"
                 </blockquote>
 
                 <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h4 className="font-display text-base font-bold text-[#1E0E16]">
+                    <h4 className="text-base font-bold text-gray-900">
                       {testimonials[testimonialIndex].name}
                     </h4>
-                    <p className="text-xs text-[#8C6169] uppercase tracking-wider font-semibold">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
                       {testimonials[testimonialIndex].role}
                     </p>
                   </div>
 
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FBEDEF] border border-[#F0DEE1] px-3.5 py-1 text-xs font-medium text-[#EA147D]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-pink-50 border border-pink-100 px-3.5 py-1 text-xs font-medium text-pink-600">
                     Purchased: {testimonials[testimonialIndex].product}
                   </span>
                 </div>
@@ -1036,8 +720,8 @@ export default function Home() {
                   role="tab"
                   aria-selected={testimonialIndex === idx}
                   aria-label={`Show testimonial from ${t.name}`}
-                  className={`h-2.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] ${
-                    testimonialIndex === idx ? "w-8 bg-[#EA147D]" : "w-2.5 bg-[#F0DEE1]"
+                  className={`h-2.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 ${
+                    testimonialIndex === idx ? "w-8 bg-pink-600" : "w-2.5 bg-pink-100"
                   }`}
                 />
               ))}
@@ -1046,16 +730,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 9. INSTAGRAM GALLERY */}
+      {/* 8. INSTAGRAM GALLERY */}
       <section className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center mb-12">
             <SectionEyebrow align="center">Social Inspiration</SectionEyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight text-[#1E0E16] sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
               Style Inspiration
             </h2>
-            <p className="mt-3 text-sm text-[#8C6169]">
-              Tag <strong className="text-[#EA147D]">#CinderellaSteps</strong> for a chance to be featured here.
+            <p className="mt-3 text-sm text-gray-600">
+              Tag <strong className="text-pink-600">#CinderellaSteps</strong> for a chance to be featured here.
             </p>
           </div>
 
@@ -1063,15 +747,15 @@ export default function Home() {
             {instagramPhotos.map((photo, idx) => (
               <div
                 key={idx}
-                className="group relative aspect-square overflow-hidden rounded-[2rem] border border-[#F0DEE1]"
+                className="group relative aspect-square overflow-hidden rounded-[2rem] border border-pink-100"
               >
                 <img
                   src={photo.src}
                   alt="Customer styling a Cinderella footwear look"
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#1E0E16]/60 text-white opacity-0 backdrop-blur-[2px] transition duration-300 group-hover:opacity-100">
-                  <FaInstagram size={28} className="text-[#FDF0F5]" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/60 text-white opacity-0 backdrop-blur-[2px] transition duration-300 group-hover:opacity-100">
+                  <FaInstagram size={28} className="text-pink-50" />
                   <span className="mt-3 text-xs font-semibold uppercase tracking-wider">{photo.tag}</span>
                 </div>
               </div>
@@ -1080,7 +764,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* QUICK VIEW MODAL COMPONENT */}
+      {/* QUICK VIEW MODAL */}
       <AnimatePresence>
         {selectedProduct && (
           <div
@@ -1106,14 +790,14 @@ export default function Home() {
             >
               <button
                 onClick={() => setSelectedProduct(null)}
-                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#FBEDEF] text-[#1E0E16] hover:bg-[#F0DEE1] transition z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D]"
+                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-pink-50 text-gray-900 hover:bg-pink-100 transition z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
                 aria-label="Close quick view"
               >
                 <X size={18} />
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-2">
-                <div className="relative aspect-[3/4] md:aspect-auto md:h-full min-h-[300px] overflow-hidden bg-[#F5E3E1]">
+                <div className="relative aspect-[3/4] md:aspect-auto md:h-full min-h-[300px] overflow-hidden bg-pink-50">
                   <img
                     src={getProductImage(selectedProduct)}
                     alt={selectedProduct.name}
@@ -1124,33 +808,32 @@ export default function Home() {
 
                 <div className="p-6 sm:p-8 flex flex-col justify-between">
                   <div>
-                    <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EA147D]">
+                    <span className="text-xs font-semibold uppercase tracking-[0.22em] text-pink-600">
                       {selectedProduct.category}
                     </span>
 
-                    <h3 className="mt-2 font-display text-2xl font-black text-[#1E0E16]">
+                    <h3 className="mt-2 text-2xl font-bold text-gray-900">
                       {selectedProduct.name}
                     </h3>
 
-                    <p className="mt-2 font-sans text-xl font-extrabold text-[#EA147D]">
+                    <p className="mt-2 text-xl font-extrabold text-pink-600">
                       {formatPrice(selectedProduct.price)}
                     </p>
 
                     <div className="mt-3 flex items-center gap-2">
                       <StarRating rating={selectedProduct.rating} size={12} />
-                      <span className="text-xs text-[#8C6169]">
+                      <span className="text-xs text-gray-500">
                         ({selectedProduct.reviewsCount || 10} verified reviews)
                       </span>
                     </div>
 
-                    <p className="mt-4 text-xs text-[#8C6169] leading-relaxed sm:text-sm">
+                    <p className="mt-4 text-xs text-gray-600 leading-relaxed sm:text-sm">
                       {selectedProduct.description}
                     </p>
 
-                    {/* Sizes Selection */}
                     {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
                       <div className="mt-6">
-                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#1E0E16]">
+                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-900">
                           Select Shoe Size
                         </h4>
                         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -1162,10 +845,10 @@ export default function Home() {
                                 setQuickViewError("");
                               }}
                               aria-pressed={quickViewSize === size}
-                              className={`h-9 w-12 rounded-xl text-xs font-semibold border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] ${
+                              className={`h-9 w-12 rounded-xl text-xs font-semibold border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 ${
                                 quickViewSize === size
-                                  ? "bg-[#EA147D] border-[#EA147D] text-white"
-                                  : "bg-white border-[#F0DEE1] text-[#1E0E16] hover:border-[#EA147D]/30"
+                                  ? "bg-pink-600 border-pink-600 text-white"
+                                  : "bg-white border-pink-100 text-gray-900 hover:border-pink-300"
                               }`}
                             >
                               {size}
@@ -1175,10 +858,9 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Colors Selection */}
                     {selectedProduct.colors && selectedProduct.colors.length > 0 && (
                       <div className="mt-5">
-                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#1E0E16]">
+                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-900">
                           Select Color Variant
                         </h4>
                         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -1190,10 +872,10 @@ export default function Home() {
                                 setQuickViewError("");
                               }}
                               aria-pressed={quickViewColor === color}
-                              className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] ${
+                              className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 ${
                                 quickViewColor === color
-                                  ? "bg-[#EA147D] border-[#EA147D] text-white"
-                                  : "bg-white border-[#F0DEE1] text-[#1E0E16] hover:border-[#EA147D]/30"
+                                  ? "bg-pink-600 border-pink-600 text-white"
+                                  : "bg-white border-pink-100 text-gray-900 hover:border-pink-300"
                               }`}
                             >
                               {color}
@@ -1203,13 +885,12 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Quantity selectors */}
                     <div className="mt-5">
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#1E0E16]">Quantity</h4>
-                      <div className="mt-2 inline-flex items-center gap-4 rounded-xl border border-[#F0DEE1] px-3 py-1.5">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-900">Quantity</h4>
+                      <div className="mt-2 inline-flex items-center gap-4 rounded-xl border border-pink-100 px-3 py-1.5">
                         <button
                           onClick={() => setQuickViewQty((q) => Math.max(1, q - 1))}
-                          className="text-[#1E0E16] transition active:scale-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] rounded"
+                          className="text-gray-900 transition active:scale-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded"
                           aria-label="Decrease quantity"
                         >
                           <Minus size={14} />
@@ -1219,7 +900,7 @@ export default function Home() {
                         </span>
                         <button
                           onClick={() => setQuickViewQty((q) => q + 1)}
-                          className="text-[#1E0E16] transition active:scale-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] rounded"
+                          className="text-gray-900 transition active:scale-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded"
                           aria-label="Increase quantity"
                         >
                           <Plus size={14} />
@@ -1237,14 +918,14 @@ export default function Home() {
                   <div className="mt-8 flex gap-3">
                     <button
                       onClick={handleConfirmAddToCart}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#EA147D] text-white text-xs font-bold uppercase tracking-wider py-4 transition duration-300 hover:bg-[#B60F61] active:scale-97 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D] focus-visible:ring-offset-2"
+                      className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-500 text-white text-xs font-bold uppercase tracking-wider py-4 transition duration-300 hover:shadow-lg active:scale-97 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                     >
                       <ShoppingBag size={14} /> Add To Bag
                     </button>
 
                     <button
                       onClick={() => handleToggleWishlist(selectedProduct)}
-                      className="flex h-12 w-12 items-center justify-center rounded-full border border-[#F0DEE1] bg-white text-[#1E0E16] transition hover:border-[#EA147D] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA147D]"
+                      className="flex h-12 w-12 items-center justify-center rounded-full border border-pink-100 bg-white text-gray-900 transition hover:border-pink-400 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
                       aria-label={
                         isInWishlist(String(selectedProduct.id))
                           ? `Remove ${selectedProduct.name} from wishlist`
@@ -1254,8 +935,8 @@ export default function Home() {
                     >
                       <Heart
                         size={18}
-                        fill={isInWishlist(String(selectedProduct.id)) ? "#EA147D" : "none"}
-                        stroke={isInWishlist(String(selectedProduct.id)) ? "#EA147D" : "#1E0E16"}
+                        fill={isInWishlist(String(selectedProduct.id)) ? "#DB2777" : "none"}
+                        stroke={isInWishlist(String(selectedProduct.id)) ? "#DB2777" : "#111827"}
                       />
                     </button>
                   </div>
